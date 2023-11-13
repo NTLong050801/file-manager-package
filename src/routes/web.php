@@ -9,5 +9,6 @@ Route::prefix('file-manager')->group(function (){
     Route::get('/',[FileManagerController::class,'index'])->name('file-manager.index');
 });
 Route::prefix('ajax')->group(function (){
-   Route::get('/{fileManager}/children',[AjaxController::class,'getChildren'])->name('ajax.get-children');
+   Route::get('/children',[AjaxController::class,'getChildren'])->name('ajax.get-children');
+   Route::post('/store-folder',[AjaxController::class,'storeFolder'])->name('ajax.store-folder');
 });

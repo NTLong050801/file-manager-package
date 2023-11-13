@@ -12,5 +12,11 @@
             "name": "Nguyen Thanh Long"
         }
     ],
-    "require": {}
+    "require": {}, "extra": {
+    "laravel": {
+        "providers": [
+            "Ntlong050801\\FileManager\\FileManagerServiceProvider"
+        ]
+    }
+}
 }

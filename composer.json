@@ -1,0 +1,16 @@
+{
+    "name": "ntlong050801/file-manager",
+    "description": "crud, upload, move, rename file - folder",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Ntlong050801\\FileManager\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nguyen Thanh Long"
+        }
+    ],
+    "require": {}
+}

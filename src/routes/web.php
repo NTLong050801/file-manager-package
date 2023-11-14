@@ -11,4 +11,5 @@ Route::prefix('file-manager')->group(function (){
 Route::prefix('ajax')->group(function (){
    Route::get('/children',[AjaxController::class,'getChildren'])->name('ajax.get-children');
    Route::post('/store-folder',[AjaxController::class,'storeFolder'])->name('ajax.store-folder');
+   Route::patch('/rename',[AjaxController::class,'rename'])->name('ajax.rename');
 });

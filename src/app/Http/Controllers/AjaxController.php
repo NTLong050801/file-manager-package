@@ -68,4 +68,18 @@ class AjaxController extends Controller
             return $exception->getMessage();
         }
     }
+
+    public function rename(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string'],
+            'file_manager' => ['required', 'integer']
+       ]);
+        $file = FileManager::findOrFail($request->input('file_manager'));
+        if (!empty($file)){
+            $file->update([
+                'name' => $request->input('name'),
+            ]);
+        }
+    }
 }

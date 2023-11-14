@@ -2,9 +2,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;500;700">
     <!--end::Fonts-->
     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
-        <link href="{{asset('vendor/file-manager/css/plugins.bundle.css')}}" rel="stylesheet" type="text/css">
-        <link href="{{asset('vendor/file-manager/css/style.bundle.css')}}" rel="stylesheet" type="text/css">
-        <link href="{{asset('vendor/file-manager/css/datatables.bundle.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{asset('vendor/file-manager/css/plugins.bundle.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('vendor/file-manager/css/style.bundle.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('vendor/file-manager/css/datatables.bundle.css')}}" rel="stylesheet" type="text/css"/>
 </head>
 <div id="kt_app_content_container" class="app-container container-xxl">
     <!--begin::Card-->
@@ -137,6 +137,8 @@
         </div>
         <!--end::Card body-->
     </div>
+
+
     <!--end::Card-->
     <!--begin::Upload template-->
     <table class="d-none">
@@ -205,34 +207,7 @@
         </tbody>
     </table>
     <!--end::Upload template-->
-    <!--begin::Rename template-->
-    <div class="d-none" data-kt-filemanager-template="rename">
-        <div class="fv-row">
-            <div class="d-flex align-items-center">
-                <span id="kt_file_manager_rename_folder_icon"></span>
-                <input type="text" id="kt_file_manager_rename_input" name="rename_folder_name" placeholder="Enter the new folder name" class="form-control mw-250px me-3" value="">
-                <button class="btn btn-icon btn-light-primary me-3" id="kt_file_manager_rename_folder">
-                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-                    <span class="svg-icon svg-icon-1">
-                        <img src="{{asset('assets/media/icons/duotune/arrows/arr085.svg')}}" alt="">
-                    </span>
-                    <!--end::Svg Icon-->
-                </button>
-                <button class="btn btn-icon btn-light-danger" id="kt_file_manager_rename_folder_cancel">
-                    <span class="indicator-label">
-                        <!--begin::Svg Icon | path: icons/duotune/arrows/arr088.svg-->
-                        <span class="svg-icon svg-icon-1">
-                            <img src="{{asset('assets/media/icons/duotune/arrows/arr088.svg')}}" alt=""></span>
-                        <!--end::Svg Icon-->
-                    </span>
-                    <span class="indicator-progress">
-                        <span class="spinner-border spinner-border-sm align-middle"></span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-    <!--end::Rename template-->
+
     <!--begin::Action template-->
     <div class="d-none" data-kt-filemanager-template="action">
         <div class="d-flex justify-content-end">
@@ -578,43 +553,29 @@
         </tbody>
     </table>
     <!--end::Upload template-->
-    <!--begin::Rename template-->
-    <div class="d-none" data-kt-filemanager-template="rename">
-        <div class="fv-row">
-            <div class="d-flex align-items-center">
-                <span id="kt_file_manager_rename_folder_icon"></span>
-                <input type="text" id="kt_file_manager_rename_input" name="rename_folder_name" placeholder="Enter the new folder name" class="form-control mw-250px me-3" value="">
-                <button class="btn btn-icon btn-light-primary me-3" id="kt_file_manager_rename_folder">
-                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-                    <span class="svg-icon svg-icon-1">
-														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-															<path
-                                                                d="M9.89557 13.4982L7.79487 11.2651C7.26967 10.7068 6.38251 10.7068 5.85731 11.2651C5.37559 11.7772 5.37559 12.5757 5.85731 13.0878L9.74989 17.2257C10.1448 17.6455 10.8118 17.6455 11.2066 17.2257L18.1427 9.85252C18.6244 9.34044 18.6244 8.54191 18.1427 8.02984C17.6175 7.47154 16.7303 7.47154 16.2051 8.02984L11.061 13.4982C10.7451 13.834 10.2115 13.834 9.89557 13.4982Z"
-                                                                fill="currentColor"></path>
-														</svg>
-													</span>
-                    <!--end::Svg Icon-->
-                </button>
-                <button class="btn btn-icon btn-light-danger" id="kt_file_manager_rename_folder_cancel">
-													<span class="indicator-label">
-														<!--begin::Svg Icon | path: icons/duotune/arrows/arr088.svg-->
-														<span class="svg-icon svg-icon-1">
-															<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																<rect opacity="0.5" x="7.05025" y="15.5356" width="12" height="2" rx="1" transform="rotate(-45 7.05025 15.5356)"
-                                                                      fill="currentColor"></rect>
-																<rect x="8.46447" y="7.05029" width="12" height="2" rx="1" transform="rotate(45 8.46447 7.05029)" fill="currentColor"></rect>
-															</svg>
-														</span>
-                                                        <!--end::Svg Icon-->
-													</span>
-                    <span class="indicator-progress">
-														<span class="spinner-border spinner-border-sm align-middle"></span>
-													</span>
-                </button>
+    <!--begin::Rename modal-->
+    <!-- Modal -->
+    <div class="modal fade" id="rename_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi tên thư mục/ tệp</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label mb-2" for="value">
+                        <span class="required">Tên thư mục/ tệp</span>
+                    </label>
+                    <input class="form-control" id="name_folder_rename" placeholder="Nhập tên thư mục" name="name" required/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="btn_update_folder">Đổi tên</button>
+                </div>
             </div>
         </div>
     </div>
-    <!--end::Rename template-->
+    <!--end::Rename modal-->
     <!--begin::Action template-->
     <div class="d-none" data-kt-filemanager-template="action">
         <div class="d-flex justify-content-end">
@@ -930,13 +891,15 @@
 
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-{{--<script src="{{asset('vendor/file-manager/js/plugins.bundle.js')}}"></script>--}}
+{{--<script src="{{asset('vendor/file-manager/js/common.js')}}"></script>--}}
 {{--<script src="{{asset('vendor/file-manager/js/scripts.bundle.js')}}"></script>--}}
 <script>
     $(document).ready(function () {
         let parentId = {{$parent->id}};
         let csrfToken = "{{ csrf_token() }}";
-        let userId = {{auth()->id()}}
+        let userId = {{auth()->id()}};
+        let rowId ;
+        let tr;
 
         $('#btn_store_folder').on('click', function () {
             const name = $('#name_folder').val();
@@ -959,18 +922,78 @@
             loadFolder(parentId)
         })
 
+//         $(document).on('click', function (event) {
+//             // Check if the clicked element is not within the menu or the button
+//             if (!$(event.target).closest('.menu-sub-dropdown').length && !$(event.target).hasClass('menu-toggle')) {
+//                 // Hide all menus
+//                 $('.menu-sub-dropdown').removeClass('show');
+//             }
+//         });
+//
+// // Prevent clicks inside the menu from closing it immediately
+//         $('.menu-sub-dropdown').on('click', function (event) {
+//             event.stopPropagation();
+//         });
+
+
         $(document).on('click', '.menu-toggle', function () {
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
-
-            var closestMs2 = $(this).closest('div');
+            const closest = $(this).closest('.more');
+            rowId = closest.data('id');
+            tr = $(this).closest('tr');
             // Find the menu within the closest ancestor
-            var targetMenu = closestMs2.find('.menu');
+            const targetMenu = closest.find('.menu');
+
+            // Hide all other menus except the one associated with the clicked button
+            $('.menu-sub-dropdown').not(targetMenu).removeClass('show');
 
             // Toggle the visibility of the menu
-            if (targetMenu.hasClass('menu-sub')) {
-                targetMenu.toggleClass('show z-100');
+            if (targetMenu.hasClass('menu-sub-dropdown')) {
+                targetMenu.toggleClass('show');
             }
         });
+
+        $(document).on('click','.rename',function () {
+            const name = tr.find('.show-children').text()
+            $('#name_folder_rename').val(name);
+            $('#rename_modal').modal('show')
+        })
+
+        $('#btn_update_folder').on('click',function () {
+            const name =  $('#name_folder_rename').val();
+            if (!name) {
+                showToast("Không để trống trường tên!", null, 'error')
+            } else {
+                let formData = new FormData();
+                formData.append('name', name)
+                formData.append('file_manager', rowId)
+                formData.append('_method', 'PATCH')
+                renameFile(formData)
+                tr.find('.show-children').text(name)
+            }
+        })
+
+        const renameFile = (formData) => {
+            $.ajax({
+                url: "{{route('ajax.rename')}}",
+                data: formData,
+                method: 'post',
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function (response) {
+                    $('#rename_modal').modal('hide')
+                    $('#name_folder_rename').val('')
+                    // loadFolder(parentId)
+                    showToast('Sửa thành công', null, 'success')
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
+        }
 
         const loadFolder = () => {
             $.ajax({
@@ -1003,7 +1026,7 @@
                     $('#create_folder_modal').modal('hide')
                     $('#name_folder').val('')
                     loadFolder(parentId)
-                    showToast('Tạo thư mục thành công',null,'success')
+                    showToast('Tạo thư mục thành công', null, 'success')
                 },
                 error: function (error) {
                     console.log(error)

@@ -113,9 +113,13 @@
                                                 <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_file_manager_list .form-check-input" value="1">
                                             </div>
                                         </th>
+                                        <th>STT</th>
                                         <th class="min-w-250px sorting_disabled" rowspan="1" colspan="1">Tên</th>
-                                        <th class="min-w-10px sorting_disabled" rowspan="1" colspan="1">Kích thước</th>
-                                        <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Cập nhật</th>
+                                        <th class="min-w-150px sorting_disabled" rowspan="1" colspan="1">Người tạo</th>
+                                        <th class="min-w-30px sorting_disabled" rowspan="1" colspan="1">Kích thước</th>
+                                        <th class="min-w-150px sorting_disabled" rowspan="1" colspan="1">Phân quyền</th>
+                                        <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Ngày tạo</th>
+                                        <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Tải xuống</th>
                                         <th class="w-125px sorting_disabled" rowspan="1" colspan="1"></th>
                                     </tr>
                                     <!--end::Table row-->
@@ -341,7 +345,9 @@
                                 <div class="dropzone-items wm-200px">
                                     <div class="mb-3">
                                         <label for="formFileMultiple" class="form-label">Chọn file</label>
-                                        <input class="form-control" type="file" id="formFileMultiple" name="files[]" multiple>
+                                        <input class="form-control" type="file" id="formFileMultiple" name="files[]" multiple
+                                               accept="image/*, .doc,.docx,.pdf"
+                                        >
                                     </div>
                                 </div>
                             </div>
@@ -899,7 +905,12 @@
                 showToast('Vui lòng chọn ít nhất một tệp', null, 'error')
             }
         });
-
+        $(document).on('click','.download',function () {
+            const id = $(this).closest('tr').data('id');
+            let downloadUrl = "{{ route('ajax.download-file', ['id' => 'valueId']) }}";
+            downloadUrl = downloadUrl.replace('valueId', id);
+            window.open(downloadUrl, '_blank');
+        })
         const renameFile = (formData) => {
             $.ajax({
                 url: "{{route('ajax.rename')}}",
@@ -935,6 +946,7 @@
                     $('tbody').html(response.view)
                     $('#folder_path').html(response.folder_path)
                     $('#count_item').html(response.count_children.toString() + ' items')
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 }
             })
         }
@@ -978,6 +990,7 @@
                 }
             });
         }
+
         loadFolder()
     })
 </script>

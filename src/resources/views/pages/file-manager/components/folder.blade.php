@@ -1,6 +1,6 @@
 @if($childrens->count() > 0)
     @foreach($childrens as $children)
-        <tr class="even">
+        <tr class="even"data-id="{{$children->id}}">
             <!--begin::Checkbox-->
             <td>
                 <div class="form-check form-check-sm form-check-custom form-check-solid">
@@ -45,7 +45,9 @@
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->
             <td>
-                <button class="btn btn-sm btn-success download">Tải</button>
+                @if(sizeof($children->childFiles($children->file_path)) > 0)
+                    <button class="btn btn-sm btn-success download">Tải</button>
+                @endif
             </td>
             <!--begin::Actions-->
             <td class="text-end" data-kt-filemanager-table="action_dropdown">

@@ -12,5 +12,6 @@ Route::prefix('ajax')->group(function (){
    Route::get('/children',[AjaxController::class,'getChildren'])->name('ajax.get-children');
    Route::post('/store-folder',[AjaxController::class,'storeFolder'])->name('ajax.store-folder');
    Route::patch('/rename',[AjaxController::class,'rename'])->name('ajax.rename');
-   Route::post('/uploadFile',[AjaxController::class,'uploadFile'])->name('ajax.upload-file');
+   Route::post('/upload-file',[AjaxController::class,'uploadFile'])->name('ajax.upload-file');
+   Route::get('/download-file',[AjaxController::class,'downloadFile'])->name('ajax.download-file');
 });

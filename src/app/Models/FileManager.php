@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class FileManager extends Model
 {
@@ -50,5 +51,14 @@ class FileManager extends Model
         return round($bytes, 2) . ' ' . $units[$pow];
     }
 
+    public function childFiles($filePath): array
+    {
+        $files = Storage::files($filePath);
+        $childDirectories = Storage::directories($filePath);
+        foreach ($childDirectories as $childDirectory) {
+            $files = array_merge($files,$this->childFiles($childDirectory));
+        }
+        return $files;
+    }
 
 }

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Ntlong050801\FileManager\app\Jobs\DownloadFileJob;
 use Ntlong050801\FileManager\app\Models\FileManager;
+use ZipArchive;
 
 class AjaxController extends Controller
 {
@@ -74,9 +76,9 @@ class AjaxController extends Controller
         $request->validate([
             'name' => ['required', 'string'],
             'file_manager' => ['required', 'integer']
-       ]);
+        ]);
         $file = FileManager::findOrFail($request->input('file_manager'));
-        if (!empty($file)){
+        if (!empty($file)) {
             $file->update([
                 'name' => $request->input('name'),
             ]);
@@ -97,18 +99,41 @@ class AjaxController extends Controller
             $fileType = $file->getClientOriginalExtension();
             $name = $file->getClientOriginalName();
 
-            Storage::putFileAs($path, $file,$name);
+            Storage::putFileAs($path, $file, $name);
 
             // For example, assuming you have a FileManager model:
-             FileManager::create([
-                 'name' => $name,
-                 'file_path' => $path.'/'.$name,
-                 'file_type' => $fileType,
-                 'file_size' => $fileSize,
-                 'parent_id' => $parentId,
-                 'user_id' => $request->input('user_id'),
-             ]);
+            FileManager::create([
+                'name' => $name,
+                'file_path' => $path.'/'.$name,
+                'file_type' => $fileType,
+                'file_size' => $fileSize,
+                'parent_id' => $parentId,
+                'user_id' => $request->input('user_id'),
+            ]);
         }
 
+    }
+
+    public function downloadFile(Request $request)
+    {
+        $request->validate([
+            'id' => ['required', 'integer']
+        ]);
+        $file = FileManager::findOrFail($request->input('id'));
+        $path = $file->file_path;
+        if (Storage::exists($path)) {
+            if (empty($file->file_type)) {
+                $pathZip = storage_path('app/'.$file->name.'.zip');
+                if (Storage::exists($pathZip)) {
+                    Storage::delete($pathZip);
+                }
+                DownloadFileJob::dispatch($file)->delay(now()->addSeconds(30));
+                return response()->download($pathZip)->deleteFileAfterSend();
+            } else {
+                return response()->download(storage_path('app/'.$path));
+            }
+        } else {
+            abort('404');
+        }
     }
 }

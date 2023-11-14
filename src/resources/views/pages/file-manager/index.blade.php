@@ -314,7 +314,7 @@
             <!--begin::Modal content-->
             <div class="modal-content">
                 <!--begin::Form-->
-                <form class="form" action="none" id="kt_modal_upload_form">
+                <form class="form" action="none" id="modal_upload_form" enctype="multipart/form-data">
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
@@ -332,25 +332,17 @@
                     </div>
                     <!--end::Modal header-->
                     <!--begin::Modal body-->
-                    <div class="modal-body pt-10 pb-15 px-lg-17">
+                    <div class="modal-body pb-15 px-lg-17">
                         <!--begin::Input group-->
                         <div class="form-group">
                             <!--begin::Dropzone-->
                             <div class="dropzone dropzone-queue mb-2" id="kt_modal_upload_dropzone">
-                                <!--begin::Controls-->
-                                <div class="dropzone-panel mb-4">
-                                    <a class="dropzone-select btn btn-sm btn-primary me-2 dz-clickable">Attach files</a>
-                                    <a class="dropzone-upload btn btn-sm btn-light-primary me-2">Upload All</a>
-                                    <a class="dropzone-remove-all btn btn-sm btn-light-primary">Remove All</a>
-                                </div>
-                                <!--end::Controls-->
                                 <!--begin::Items-->
                                 <div class="dropzone-items wm-200px">
-
-                                </div>
-                                <!--end::Items-->
-                                <div class="dz-default dz-message">
-                                    <button class="dz-button" type="button">Drop files here to upload</button>
+                                    <div class="mb-3">
+                                        <label for="formFileMultiple" class="form-label">Chọn file</label>
+                                        <input class="form-control" type="file" id="formFileMultiple" name="files[]" multiple>
+                                    </div>
                                 </div>
                             </div>
                             <!--end::Dropzone-->
@@ -361,6 +353,10 @@
                         <!--end::Input group-->
                     </div>
                     <!--end::Modal body-->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="btn_upload_file">Upload</button>
+                    </div>
                 </form>
                 <!--end::Form-->
             </div>
@@ -689,97 +685,6 @@
         </div>
     </div>
     <!--end::Checkbox template-->
-    <!--begin::Modals-->
-    <div class="modal fade" id="kt_modal_upload" tabindex="-1" aria-hidden="true">
-        <!--begin::Modal dialog-->
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-            <!--begin::Modal content-->
-            <div class="modal-content">
-                <!--begin::Form-->
-                <form class="form" action="none" id="kt_modal_upload_form">
-                    <!--begin::Modal header-->
-                    <div class="modal-header">
-                        <!--begin::Modal title-->
-                        <h2 class="fw-bold">Upload files</h2>
-                        <!--end::Modal title-->
-                        <!--begin::Close-->
-                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
-                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-                            <span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																	<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"/>
-																	<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"/>
-																</svg>
-															</span>
-                            <!--end::Svg Icon-->
-                        </div>
-                        <!--end::Close-->
-                    </div>
-                    <!--end::Modal header-->
-                    <!--begin::Modal body-->
-                    <div class="modal-body pt-10 pb-15 px-lg-17">
-                        <!--begin::Input group-->
-                        <div class="form-group">
-                            <!--begin::Dropzone-->
-                            <div class="dropzone dropzone-queue mb-2" id="kt_modal_upload_dropzone">
-                                <!--begin::Controls-->
-                                <div class="dropzone-panel mb-4">
-                                    <a class="dropzone-select btn btn-sm btn-primary me-2">Attach files</a>
-                                    <a class="dropzone-upload btn btn-sm btn-light-primary me-2">Upload All</a>
-                                    <a class="dropzone-remove-all btn btn-sm btn-light-primary">Remove All</a>
-                                </div>
-                                <!--end::Controls-->
-                                <!--begin::Items-->
-                                <div class="dropzone-items wm-200px">
-                                    <div class="dropzone-item p-5" style="display:none">
-                                        <!--begin::File-->
-                                        <div class="dropzone-file">
-                                            <div class="dropzone-filename text-dark" title="some_image_file_name.jpg">
-                                                <span data-dz-name="">some_image_file_name.jpg</span>
-                                                <strong>(
-                                                    <span data-dz-size="">340kb</span>)</strong>
-                                            </div>
-                                            <div class="dropzone-error mt-0" data-dz-errormessage=""></div>
-                                        </div>
-                                        <!--end::File-->
-                                        <!--begin::Progress-->
-                                        <div class="dropzone-progress">
-                                            <div class="progress bg-light-primary">
-                                                <div class="progress-bar bg-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-dz-uploadprogress=""></div>
-                                            </div>
-                                        </div>
-                                        <!--end::Progress-->
-                                        <!--begin::Toolbar-->
-                                        <div class="dropzone-toolbar">
-																			<span class="dropzone-start">
-																				<i class="bi bi-play-fill fs-3"></i>
-																			</span>
-                                            <span class="dropzone-cancel" data-dz-remove="" style="display: none;">
-																				<i class="bi bi-x fs-3"></i>
-																			</span>
-                                            <span class="dropzone-delete" data-dz-remove="">
-																				<i class="bi bi-x fs-1"></i>
-																			</span>
-                                        </div>
-                                        <!--end::Toolbar-->
-                                    </div>
-                                </div>
-                                <!--end::Items-->
-                            </div>
-                            <!--end::Dropzone-->
-                            <!--begin::Hint-->
-                            <span class="form-text fs-6 text-muted">Max file size is 1MB per file.</span>
-                            <!--end::Hint-->
-                        </div>
-                        <!--end::Input group-->
-                    </div>
-                    <!--end::Modal body-->
-                </form>
-                <!--end::Form-->
-            </div>
-        </div>
-    </div>
-    <!--begin::Modal - New Product-->
     <div class="modal fade" id="kt_modal_move_to_folder" tabindex="-1" aria-hidden="true">
         <!--begin::Modal dialog-->
         <div class="modal-dialog modal-dialog-centered mw-650px">
@@ -898,7 +803,7 @@
         let parentId = {{$parent->id}};
         let csrfToken = "{{ csrf_token() }}";
         let userId = {{auth()->id()}};
-        let rowId ;
+        let rowId;
         let tr;
 
         $('#btn_store_folder').on('click', function () {
@@ -953,14 +858,14 @@
             }
         });
 
-        $(document).on('click','.rename',function () {
+        $(document).on('click', '.rename', function () {
             const name = tr.find('.show-children').text()
             $('#name_folder_rename').val(name);
             $('#rename_modal').modal('show')
         })
 
-        $('#btn_update_folder').on('click',function () {
-            const name =  $('#name_folder_rename').val();
+        $('#btn_update_folder').on('click', function () {
+            const name = $('#name_folder_rename').val();
             if (!name) {
                 showToast("Không để trống trường tên!", null, 'error')
             } else {
@@ -972,6 +877,28 @@
                 tr.find('.show-children').text(name)
             }
         })
+
+        $('#btn_upload_file').on('click', function () {
+            const input = $('#formFileMultiple')[0];
+            // Check if files are selected
+            if (input.files.length > 0) {
+                // Loop through each selected file
+                for (let i = 0; i < input.files.length; i++) {
+                    const file = input.files[i];
+                    if (file.size > 1024 * 1024) {
+                        showToast('Kích thước tệp vượt quá giới hạn (1MB). Vui lòng chọn tệp nhỏ hơn', null, 'error')
+                        return;
+                    }
+                }
+
+                const formData = new FormData($('#modal_upload_form')[0]);
+                formData.append('parent_id', parentId)
+                formData.append('user_id', userId)
+                uploadFile(formData)
+            } else {
+                showToast('Vui lòng chọn ít nhất một tệp', null, 'error')
+            }
+        });
 
         const renameFile = (formData) => {
             $.ajax({
@@ -1031,6 +958,24 @@
                 error: function (error) {
                     console.log(error)
                 },
+            });
+        }
+        const uploadFile = (formData) => {
+            $.ajax({
+                url: '{{route('ajax.upload-file')}}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    loadFolder()
+                    showToast("Tải file thành công", null, 'success')
+                    $('#kt_modal_upload').modal('hide')
+                },
+                error: function (error) {
+                    // Handle errors
+                    console.log(error);
+                }
             });
         }
         loadFolder()

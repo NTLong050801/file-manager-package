@@ -82,4 +82,33 @@ class AjaxController extends Controller
             ]);
         }
     }
+
+    public function uploadFile(Request $request)
+    {
+        $request->validate([
+            'files.*' => 'required|mimes:jpg,png,pdf|max:1024',
+            'parent_id' => ['required', 'integer'],
+        ]);
+        $parentId = $request->input('parent_id');
+        $path = FileManager::findOrFail($parentId)->file_path;
+        foreach ($request->file('files') as $file) {
+            // Get the file size in bytes
+            $fileSize = $file->getSize();
+            $fileType = $file->getClientOriginalExtension();
+            $name = $file->getClientOriginalName();
+
+            Storage::putFileAs($path, $file,$name);
+
+            // For example, assuming you have a FileManager model:
+             FileManager::create([
+                 'name' => $name,
+                 'file_path' => $path.'/'.$name,
+                 'file_type' => $fileType,
+                 'file_size' => $fileSize,
+                 'parent_id' => $parentId,
+                 'user_id' => $request->input('user_id'),
+             ]);
+        }
+
+    }
 }

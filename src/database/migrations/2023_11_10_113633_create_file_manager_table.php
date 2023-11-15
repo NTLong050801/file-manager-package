@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('file_size')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('file_manager')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users');
+            $table->boolean('is_trash')->default(false);
             $table->timestamps();
         });
         $users = \App\Models\User::all();

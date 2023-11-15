@@ -114,13 +114,13 @@
                                             </div>
                                         </th>
                                         <th>STT</th>
-                                        <th class="min-w-250px sorting_disabled" rowspan="1" colspan="1">Tên</th>
-                                        <th class="min-w-150px sorting_disabled" rowspan="1" colspan="1">Người tạo</th>
-                                        <th class="min-w-30px sorting_disabled" rowspan="1" colspan="1">Kích thước</th>
+                                        <th class="min-w-200px sorting_disabled" rowspan="1" colspan="1">Tên</th>
+                                        <th class="min-w-100px sorting_disabled" rowspan="1" colspan="1">Người tạo</th>
+                                        <th class="min-w-100px sorting_disabled" rowspan="1" colspan="1">Kích thước</th>
                                         <th class="min-w-150px sorting_disabled" rowspan="1" colspan="1">Phân quyền</th>
                                         <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Ngày tạo</th>
                                         <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Tải xuống</th>
-                                        <th class="w-125px sorting_disabled" rowspan="1" colspan="1"></th>
+                                        <th class="w-50px sorting_disabled" rowspan="1" colspan="1"></th>
                                     </tr>
                                     <!--end::Table row-->
                                     </thead>
@@ -144,165 +144,6 @@
 
 
     <!--end::Card-->
-    <!--begin::Upload template-->
-    <table class="d-none">
-        <tbody>
-        <tr id="kt_file_manager_new_folder_row" data-kt-filemanager-template="upload">
-            <td></td>
-            <td id="kt_file_manager_add_folder_form" class="fv-row">
-                <div class="d-flex align-items-center">
-                    <!--begin::Folder icon-->
-                    <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                    <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-															<path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
-															<path
-                                                                d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z"
-                                                                fill="currentColor"></path>
-														</svg>
-													</span>
-                    <!--end::Svg Icon-->
-                    <!--end::Folder icon-->
-                    <!--begin:Input-->
-                    <input type="text" name="new_folder_name" placeholder="Enter the folder name" class="form-control mw-250px me-3">
-                    <!--end:Input-->
-                    <!--begin:Submit button-->
-                    <button class="btn btn-icon btn-light-primary me-3" id="kt_file_manager_add_folder">
-														<span class="indicator-label">
-															<!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-															<span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																	<path
-                                                                        d="M9.89557 13.4982L7.79487 11.2651C7.26967 10.7068 6.38251 10.7068 5.85731 11.2651C5.37559 11.7772 5.37559 12.5757 5.85731 13.0878L9.74989 17.2257C10.1448 17.6455 10.8118 17.6455 11.2066 17.2257L18.1427 9.85252C18.6244 9.34044 18.6244 8.54191 18.1427 8.02984C17.6175 7.47154 16.7303 7.47154 16.2051 8.02984L11.061 13.4982C10.7451 13.834 10.2115 13.834 9.89557 13.4982Z"
-                                                                        fill="currentColor"></path>
-																</svg>
-															</span>
-                                                            <!--end::Svg Icon-->
-														</span>
-                        <span class="indicator-progress">
-															<span class="spinner-border spinner-border-sm align-middle"></span>
-														</span>
-                    </button>
-                    <!--end:Submit button-->
-                    <!--begin:Cancel button-->
-                    <button class="btn btn-icon btn-light-danger" id="kt_file_manager_cancel_folder">
-														<span class="indicator-label">
-															<!--begin::Svg Icon | path: icons/duotune/arrows/arr088.svg-->
-															<span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																	<rect opacity="0.5" x="7.05025" y="15.5356" width="12" height="2" rx="1" transform="rotate(-45 7.05025 15.5356)"
-                                                                          fill="currentColor"></rect>
-																	<rect x="8.46447" y="7.05029" width="12" height="2" rx="1" transform="rotate(45 8.46447 7.05029)" fill="currentColor"></rect>
-																</svg>
-															</span>
-                                                            <!--end::Svg Icon-->
-														</span>
-                        <span class="indicator-progress">
-															<span class="spinner-border spinner-border-sm align-middle"></span>
-														</span>
-                    </button>
-                    <!--end:Cancel button-->
-                </div>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
-    <!--end::Upload template-->
-
-    <!--begin::Action template-->
-    <div class="d-none" data-kt-filemanager-template="action">
-        <div class="d-flex justify-content-end">
-            <!--begin::Share link-->
-            <div class="ms-2" data-kt-filemanger-table="copy_link">
-                <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                    <!--begin::Svg Icon | path: icons/duotune/coding/cod007.svg-->
-                    <span class="svg-icon svg-icon-5 m-0">
-                            <img src="{{asset('assets/media/icons/duotune/coding/cod007.svg')}}" alt="">
-                        </span>
-                    <!--end::Svg Icon-->
-                </button>
-                <!--begin::Menu-->
-                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-300px" data-kt-menu="true">
-                    <!--begin::Card-->
-                    <div class="card card-flush">
-                        <div class="card-body p-5">
-                            <!--begin::Loader-->
-                            <div class="d-flex" data-kt-filemanger-table="copy_link_generator">
-                                <!--begin::Spinner-->
-                                <div class="me-5" data-kt-indicator="on">
-                                        <span class="indicator-progress">
-												<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-										</span>
-                                </div>
-                                <!--end::Spinner-->
-                                <!--begin::Label-->
-                                <div class="fs-6 text-dark">Generating Share Link...</div>
-                                <!--end::Label-->
-                            </div>
-                            <!--end::Loader-->
-                            <!--begin::Link-->
-                            <div class="d-flex flex-column text-start d-none" data-kt-filemanger-table="copy_link_result">
-                                <div class="d-flex mb-3">
-                                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-                                    <span class="svg-icon svg-icon-2 svg-icon-success me-3">
-                                            <img src="{{asset('assets/media/icons/duotune/arrows/arr085.svg')}}" alt="">
-										</span>
-                                    <!--end::Svg Icon-->
-                                    <div class="fs-6 text-dark">Share Link Generated</div>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="https://path/to/file/or/folder/">
-                                <div class="text-muted fw-normal mt-2 fs-8 px-3">Read only.
-                                    <a href="#" class="ms-2">Change permissions</a></div>
-                            </div>
-                            <!--end::Link-->
-                        </div>
-                    </div>
-                    <!--end::Card-->
-                </div>
-                <!--end::Menu-->
-            </div>
-            <!--end::Share link-->
-            <!--begin::More-->
-            <div class="ms-2">
-                <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                    <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
-                    <span class="svg-icon svg-icon-5 m-0">
-                            <img src="{{asset('assets/media/icons/duotune/general/gen052.svg')}}" alt="">
-                        </span>
-                    <!--end::Svg Icon-->
-                </button>
-                <!--begin::Menu-->
-                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4" data-kt-menu="true">
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3">Download File</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3" data-kt-filemanager-table="rename">Rename</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal" data-bs-target="#kt_modal_move_to_folder">Move to folder</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link text-danger px-3" data-kt-filemanager-table-filter="delete_row">Delete</a>
-                    </div>
-                    <!--end::Menu item-->
-                </div>
-                <!--end::Menu-->
-            </div>
-            <!--end::More-->
-        </div>
-    </div>
-    <!--end::Action template-->
     <!--begin::Checkbox template-->
     <div class="d-none" data-kt-filemanager-template="checkbox">
         <div class="form-check form-check-sm form-check-custom form-check-solid">
@@ -488,73 +329,6 @@
     <!--end::Modal - Move file-->
     <!--end::Modals-->
     <!--end::Card-->
-    <!--begin::Upload template-->
-    <table class="d-none">
-        <tbody>
-        <tr id="kt_file_manager_new_folder_row" data-kt-filemanager-template="upload">
-            <td></td>
-            <td id="kt_file_manager_add_folder_form" class="fv-row">
-                <div class="d-flex align-items-center">
-                    <!--begin::Folder icon-->
-                    <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                    <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-															<path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
-															<path
-                                                                d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z"
-                                                                fill="currentColor"></path>
-														</svg>
-													</span>
-                    <!--end::Svg Icon-->
-                    <!--end::Folder icon-->
-                    <!--begin:Input-->
-                    <input type="text" name="new_folder_name" placeholder="Enter the folder name" class="form-control mw-250px me-3">
-                    <!--end:Input-->
-                    <!--begin:Submit button-->
-                    <button class="btn btn-icon btn-light-primary me-3" id="kt_file_manager_add_folder">
-														<span class="indicator-label">
-															<!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-															<span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																	<path
-                                                                        d="M9.89557 13.4982L7.79487 11.2651C7.26967 10.7068 6.38251 10.7068 5.85731 11.2651C5.37559 11.7772 5.37559 12.5757 5.85731 13.0878L9.74989 17.2257C10.1448 17.6455 10.8118 17.6455 11.2066 17.2257L18.1427 9.85252C18.6244 9.34044 18.6244 8.54191 18.1427 8.02984C17.6175 7.47154 16.7303 7.47154 16.2051 8.02984L11.061 13.4982C10.7451 13.834 10.2115 13.834 9.89557 13.4982Z"
-                                                                        fill="currentColor"></path>
-																</svg>
-															</span>
-                                                            <!--end::Svg Icon-->
-														</span>
-                        <span class="indicator-progress">
-															<span class="spinner-border spinner-border-sm align-middle"></span>
-														</span>
-                    </button>
-                    <!--end:Submit button-->
-                    <!--begin:Cancel button-->
-                    <button class="btn btn-icon btn-light-danger" id="kt_file_manager_cancel_folder">
-														<span class="indicator-label">
-															<!--begin::Svg Icon | path: icons/duotune/arrows/arr088.svg-->
-															<span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																	<rect opacity="0.5" x="7.05025" y="15.5356" width="12" height="2" rx="1" transform="rotate(-45 7.05025 15.5356)"
-                                                                          fill="currentColor"></rect>
-																	<rect x="8.46447" y="7.05029" width="12" height="2" rx="1" transform="rotate(45 8.46447 7.05029)" fill="currentColor"></rect>
-																</svg>
-															</span>
-                                                            <!--end::Svg Icon-->
-														</span>
-                        <span class="indicator-progress">
-															<span class="spinner-border spinner-border-sm align-middle"></span>
-														</span>
-                    </button>
-                    <!--end:Cancel button-->
-                </div>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
-    <!--end::Upload template-->
     <!--begin::Rename modal-->
     <!-- Modal -->
     <div class="modal fade" id="rename_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -578,118 +352,6 @@
         </div>
     </div>
     <!--end::Rename modal-->
-    <!--begin::Action template-->
-    <div class="d-none" data-kt-filemanager-template="action">
-        <div class="d-flex justify-content-end">
-            <!--begin::Share link-->
-            <div class="ms-2" data-kt-filemanger-table="copy_link">
-                <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                    <!--begin::Svg Icon | path: icons/duotune/coding/cod007.svg-->
-                    <span class="svg-icon svg-icon-5 m-0">
-														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-															<path opacity="0.3"
-                                                                  d="M18.4 5.59998C18.7766 5.9772 18.9881 6.48846 18.9881 7.02148C18.9881 7.55451 18.7766 8.06577 18.4 8.44299L14.843 12C14.466 12.377 13.9547 12.5887 13.4215 12.5887C12.8883 12.5887 12.377 12.377 12 12C11.623 11.623 11.4112 11.1117 11.4112 10.5785C11.4112 10.0453 11.623 9.53399 12 9.15698L15.553 5.604C15.9302 5.22741 16.4415 5.01587 16.9745 5.01587C17.5075 5.01587 18.0188 5.22741 18.396 5.604L18.4 5.59998ZM20.528 3.47205C20.0614 3.00535 19.5074 2.63503 18.8977 2.38245C18.288 2.12987 17.6344 1.99988 16.9745 1.99988C16.3145 1.99988 15.661 2.12987 15.0513 2.38245C14.4416 2.63503 13.8876 3.00535 13.421 3.47205L9.86801 7.02502C9.40136 7.49168 9.03118 8.04568 8.77863 8.6554C8.52608 9.26511 8.39609 9.91855 8.39609 10.5785C8.39609 11.2384 8.52608 11.8919 8.77863 12.5016C9.03118 13.1113 9.40136 13.6653 9.86801 14.132C10.3347 14.5986 10.8886 14.9688 11.4984 15.2213C12.1081 15.4739 12.7616 15.6039 13.4215 15.6039C14.0815 15.6039 14.7349 15.4739 15.3446 15.2213C15.9543 14.9688 16.5084 14.5986 16.975 14.132L20.528 10.579C20.9947 10.1124 21.3649 9.55844 21.6175 8.94873C21.8701 8.33902 22.0001 7.68547 22.0001 7.02551C22.0001 6.36555 21.8701 5.71201 21.6175 5.10229C21.3649 4.49258 20.9947 3.93867 20.528 3.47205Z"
-                                                                  fill="currentColor"></path>
-															<path
-                                                                d="M14.132 9.86804C13.6421 9.37931 13.0561 8.99749 12.411 8.74695L12 9.15698C11.6234 9.53421 11.4119 10.0455 11.4119 10.5785C11.4119 11.1115 11.6234 11.6228 12 12C12.3766 12.3772 12.5881 12.8885 12.5881 13.4215C12.5881 13.9545 12.3766 14.4658 12 14.843L8.44699 18.396C8.06999 18.773 7.55868 18.9849 7.02551 18.9849C6.49235 18.9849 5.98101 18.773 5.604 18.396C5.227 18.019 5.0152 17.5077 5.0152 16.9745C5.0152 16.4413 5.227 15.93 5.604 15.553L8.74701 12.411C8.28705 11.233 8.28705 9.92498 8.74701 8.74695C8.10159 8.99737 7.5152 9.37919 7.02499 9.86804L3.47198 13.421C2.52954 14.3635 2.00009 15.6417 2.00009 16.9745C2.00009 18.3073 2.52957 19.5855 3.47202 20.528C4.41446 21.4704 5.69269 21.9999 7.02551 21.9999C8.35833 21.9999 9.63656 21.4704 10.579 20.528L14.132 16.975C14.5987 16.5084 14.9689 15.9544 15.2215 15.3447C15.4741 14.735 15.6041 14.0815 15.6041 13.4215C15.6041 12.7615 15.4741 12.108 15.2215 11.4983C14.9689 10.8886 14.5987 10.3347 14.132 9.86804Z"
-                                                                fill="currentColor"></path>
-														</svg>
-													</span>
-                    <!--end::Svg Icon-->
-                </button>
-                <!--begin::Menu-->
-                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-300px" data-kt-menu="true">
-                    <!--begin::Card-->
-                    <div class="card card-flush">
-                        <div class="card-body p-5">
-                            <!--begin::Loader-->
-                            <div class="d-flex" data-kt-filemanger-table="copy_link_generator">
-                                <!--begin::Spinner-->
-                                <div class="me-5" data-kt-indicator="on">
-																	<span class="indicator-progress">
-																		<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-																	</span>
-                                </div>
-                                <!--end::Spinner-->
-                                <!--begin::Label-->
-                                <div class="fs-6 text-dark">Generating Share Link...</div>
-                                <!--end::Label-->
-                            </div>
-                            <!--end::Loader-->
-                            <!--begin::Link-->
-                            <div class="d-flex flex-column text-start d-none" data-kt-filemanger-table="copy_link_result">
-                                <div class="d-flex mb-3">
-                                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr085.svg-->
-                                    <span class="svg-icon svg-icon-2 svg-icon-success me-3">
-																		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																			<path
-                                                                                d="M9.89557 13.4982L7.79487 11.2651C7.26967 10.7068 6.38251 10.7068 5.85731 11.2651C5.37559 11.7772 5.37559 12.5757 5.85731 13.0878L9.74989 17.2257C10.1448 17.6455 10.8118 17.6455 11.2066 17.2257L18.1427 9.85252C18.6244 9.34044 18.6244 8.54191 18.1427 8.02984C17.6175 7.47154 16.7303 7.47154 16.2051 8.02984L11.061 13.4982C10.7451 13.834 10.2115 13.834 9.89557 13.4982Z"
-                                                                                fill="currentColor"></path>
-																		</svg>
-																	</span>
-                                    <!--end::Svg Icon-->
-                                    <div class="fs-6 text-dark">Share Link Generated</div>
-                                </div>
-                                <input type="text" class="form-control form-control-sm" value="https://path/to/file/or/folder/">
-                                <div class="text-muted fw-normal mt-2 fs-8 px-3">Read only.
-                                    <a href="../../demo1/dist/apps/file-manager/settings/.html" class="ms-2">Change permissions</a></div>
-                            </div>
-                            <!--end::Link-->
-                        </div>
-                    </div>
-                    <!--end::Card-->
-                </div>
-                <!--end::Menu-->
-            </div>
-            <!--end::Share link-->
-            <!--begin::More-->
-            <div class="ms-2">
-                <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                    <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
-                    <span class="svg-icon svg-icon-5 m-0">
-														<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-															<rect x="10" y="10" width="4" height="4" rx="2" fill="currentColor"></rect>
-															<rect x="17" y="10" width="4" height="4" rx="2" fill="currentColor"></rect>
-															<rect x="3" y="10" width="4" height="4" rx="2" fill="currentColor"></rect>
-														</svg>
-													</span>
-                    <!--end::Svg Icon-->
-                </button>
-                <!--begin::Menu-->
-                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4" data-kt-menu="true">
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3">Download File</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3" data-kt-filemanager-table="rename">Rename</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal" data-bs-target="#kt_modal_move_to_folder">Move to folder</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="#" class="menu-link text-danger px-3" data-kt-filemanager-table-filter="delete_row">Delete</a>
-                    </div>
-                    <!--end::Menu item-->
-                </div>
-                <!--end::Menu-->
-            </div>
-            <!--end::More-->
-        </div>
-    </div>
-    <!--end::Action template-->
-    <!--begin::Checkbox template-->
-    <div class="d-none" data-kt-filemanager-template="checkbox">
-        <div class="form-check form-check-sm form-check-custom form-check-solid">
-            <input class="form-check-input" type="checkbox" value="1">
-        </div>
-    </div>
     <!--end::Checkbox template-->
     <div class="modal fade" id="kt_modal_move_to_folder" tabindex="-1" aria-hidden="true">
         <!--begin::Modal dialog-->
@@ -911,6 +573,30 @@
             downloadUrl = downloadUrl.replace('valueId', id);
             window.open(downloadUrl, '_blank');
         })
+
+        $(document).on('click','.delete',function(){
+
+            Swal.fire({
+                text: `Bạn có chắc muốn xoá thư mục/bản ghi này?`,
+                icon: "warning",
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Có",
+                cancelButtonText: "Huỷ",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger"
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append('id',rowId);
+                    formData.append('value',1);
+                    formData.append('_method','PATCH');
+                    putTrashFolder(formData)
+                }
+            });
+        })
         const renameFile = (formData) => {
             $.ajax({
                 url: "{{route('ajax.rename')}}",
@@ -984,9 +670,25 @@
                     showToast("Tải file thành công", null, 'success')
                     $('#kt_modal_upload').modal('hide')
                 },
-                error: function (error) {
-                    // Handle errors
-                    console.log(error);
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
+            });
+        }
+        const putTrashFolder = (formData) => {
+            $.ajax({
+                url: '{{route('ajax.put-file-trash')}}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    loadFolder()
+                    showToast("Xoá thành công", null, 'success')
+                    // $('#kt_modal_upload').modal('hide')
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
                 }
             });
         }

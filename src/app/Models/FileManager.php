@@ -22,6 +22,7 @@ class FileManager extends Model
         'file_size',
         'parent_id',
         'user_id',
+        'is_trash',
     ];
 
     public function user(): BelongsTo

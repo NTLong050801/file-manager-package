@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Ntlong050801\FileManager\app\Jobs\DownloadFileJob;
 use Ntlong050801\FileManager\app\Models\FileManager;
 use ZipArchive;
@@ -20,7 +22,7 @@ class AjaxController extends Controller
             $parent = FileManager::find($request->input('parent_id'));
         }
 
-        $childrens = $parent->children;
+        $childrens = $parent->children->reverse();
         $view = view('file-manager::pages.file-manager.components.folder', compact('childrens'))->render();
         $folderPath = $parent->file_path;
         $segments = explode('/', $folderPath);
@@ -58,7 +60,12 @@ class AjaxController extends Controller
 
         try {
             $name = $request->input('name');
-            $path = FileManager::find($request->input('parent_id'))->file_path."/$name";
+            if (empty($request->input('parent_id'))) {
+                $parent = FileManager::where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
+            }else {
+                $parent = FileManager::find($request->input('parent_id'));
+            }
+            $path = $parent->file_path."/$name";
             Storage::makeDirectory($path);
             FileManager::create([
                 'name' => $name,
@@ -88,7 +95,8 @@ class AjaxController extends Controller
     public function uploadFile(Request $request)
     {
         $request->validate([
-            'files.*' => 'required|mimes:jpg,png,pdf|max:1024',
+            'files.*'    => 'required|mimes:doc,csv,xlsx,xls,docx,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
+
             'parent_id' => ['required', 'integer'],
         ]);
         $parentId = $request->input('parent_id');
@@ -136,4 +144,29 @@ class AjaxController extends Controller
             abort('404');
         }
     }
+
+    public function trash(Request $request)
+    {
+        $request->validate([
+            'id' => ['required','integer'],
+            'value' => ['required',  Rule::in(['0','1'])]
+        ]);
+        try {
+            $file = FileManager::findOrFail($request->input('id'));
+            $this->updateIsTrash($file,$request->input('value'));
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+    }
+
+
+    private function updateIsTrash(FileManager $fileManager, $value){
+        $fileManager->update([
+            'is_trash' => $value,
+        ]);
+        foreach ($fileManager->children as $child){
+            $this->updateIsTrash($child,$value);
+        }
+    }
+
 }

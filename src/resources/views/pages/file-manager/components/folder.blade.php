@@ -33,9 +33,11 @@
             </td>
             <!--end::Name=-->
             <td>
-                <img src="{{$children->user->avatar}}" class="me-4 rounded-circle w-40px" alt=""
-                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{$children->user->name}}"
-                >
+                <div >
+                    <img src="{{$children->user->avatar}}" class="rounded-circle w-100px" alt=""
+                         data-bs-toggle="tooltip" data-bs-placement="top" title="{{$children->user->name}}"
+                    >
+                </div>
             </td>
             <!--begin::Size-->
             <td>{{empty($children->file_type) ? null : $children->file_size}}</td>
@@ -45,7 +47,7 @@
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->
             <td>
-                @if(sizeof($children->childFiles($children->file_path)) > 0)
+                @if(sizeof($children->childFiles($children->file_path)) > 0 || !empty($children->file_type))
                     <button class="btn btn-sm btn-success download">Tải</button>
                 @endif
             </td>
@@ -78,8 +80,8 @@
                             </div>
                             <!--end::Menu item-->
                             <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link text-danger px-3" data-kt-filemanager-table-filter="delete_row">Xoá</a>
+                            <div class="menu-item px-3 =">
+                                <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
                             </div>
                             <!--end::Menu item-->
                         </div>
@@ -93,7 +95,7 @@
     @endforeach
 @else
     <tr class="odd">
-        <td valign="top" colspan="5" class="dataTables_empty">
+        <td valign="top" colspan="12" class="dataTables_empty">
             <div class="d-flex flex-column flex-center">
                 <img src="{{asset('assets/media/illustrations/sketchy-1/5.png')}}" class="mw-400px">
                 <div class="fs-1 fw-bolder text-dark">Không tìm thấy.</div>

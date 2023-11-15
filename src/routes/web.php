@@ -14,4 +14,6 @@ Route::prefix('ajax')->group(function (){
    Route::patch('/rename',[AjaxController::class,'rename'])->name('ajax.rename');
    Route::post('/upload-file',[AjaxController::class,'uploadFile'])->name('ajax.upload-file');
    Route::get('/download-file',[AjaxController::class,'downloadFile'])->name('ajax.download-file');
+
+   Route::patch('/put-file-trash',[AjaxController::class,'trash'])->name('ajax.put-file-trash');
 });

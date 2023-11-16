@@ -124,25 +124,29 @@ class AjaxController extends Controller
 
             'parent_id' => ['required', 'integer'],
         ]);
-        $parentId = $request->input('parent_id');
-        $path = FileManager::findOrFail($parentId)->file_path;
-        foreach ($request->file('files') as $file) {
-            // Get the file size in bytes
-            $fileSize = $file->getSize();
-            $fileType = $file->getClientOriginalExtension();
-            $originalName = $file->getClientOriginalName();
-            $name = pathinfo($originalName, PATHINFO_FILENAME);
-            Storage::putFileAs($path, $file, $originalName);
+        try {
+            $parentId = $request->input('parent_id');
+            $path = FileManager::findOrFail($parentId)->file_path;
+            foreach ($request->file('files') as $file) {
+                // Get the file size in bytes
+                $fileSize = $file->getSize();
+                $fileType = $file->getClientOriginalExtension();
+                $originalName = $file->getClientOriginalName();
+                $name = pathinfo($originalName, PATHINFO_FILENAME);
+                Storage::putFileAs($path, $file, $originalName);
 
-            // For example, assuming you have a FileManager model:
-            FileManager::create([
-                'name' => $name,
-                'file_path' => $path.'/'.$originalName,
-                'file_type' => $fileType,
-                'file_size' => $fileSize,
-                'parent_id' => $parentId,
-                'user_id' => $request->input('user_id'),
-            ]);
+                // For example, assuming you have a FileManager model:
+                FileManager::create([
+                    'name' => $name,
+                    'file_path' => $path.'/'.$originalName,
+                    'file_type' => $fileType,
+                    'file_size' => $fileSize,
+                    'parent_id' => $parentId,
+                    'user_id' => $request->input('user_id'),
+                ]);
+            }
+        }catch (\Exception $exception){
+           return $exception->getMessage();
         }
 
     }
@@ -156,7 +160,7 @@ class AjaxController extends Controller
         $file = FileManager::findOrFail($request->input('id'));
         $path = $file->file_path;
         $isTrash = ($request->input('type') === 'deleted-folder');
-        
+
         if (Storage::exists($path)) {
             if (empty($file->file_type)) {
                 $pathZip = storage_path('app/'.$file->name.'.zip');
@@ -211,7 +215,8 @@ class AjaxController extends Controller
         try {
             $file = FileManager::find($request->input('id'));
             $filePath = $file->file_path;
-            if (!empty($filePath)) {
+            $this->destroyFileIsDirectDeleted($file);
+            if (!empty($file->file_type)) {
                 Storage::delete($filePath);
             } else {
                 Storage::deleteDirectory($filePath);
@@ -245,4 +250,21 @@ class AjaxController extends Controller
         }
     }
 
+    private function destroyFileIsDirectDeleted(FileManager $fileManager){
+        $root =  FileManager::root();
+        foreach ($fileManager->children as $child){
+            if ($child->is_direct_deleted){
+                $originalFilePath = $child->file_path;
+                $destinationDirectory = $root->file_path;
+                $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
+                $destinationPath = $destinationDirectory.'/'.$filename;
+                Storage::move($originalFilePath, $destinationPath);
+                $child->update([
+                    'parent_id' => $root->id,
+                    'file_path' => $root->file_path.'/'.$child->name,
+                ]);
+            }
+            $this->destroyFileIsDirectDeleted($child);
+        }
+    }
 }

@@ -5,6 +5,7 @@ namespace Ntlong050801\FileManager\app\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -16,38 +17,45 @@ class AjaxController extends Controller
 {
     public function getChildren(Request $request)
     {
-        if (empty($request->input('parent_id'))) {
-            $parent = FileManager::where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
+        $query = FileManager::query();
+        $finalPath = null;
+        if ($request->input('type') == 'deleted-folder') {
+            $childrens = $query->where('user_id', $request->input('user_id'))->where('is_direct_deleted', 1)->get();
         } else {
-            $parent = FileManager::find($request->input('parent_id'));
-        }
-
-        $childrens = $parent->children->reverse();
-        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens'))->render();
-        $folderPath = $parent->file_path;
-        $segments = explode('/', $folderPath);
-
-        foreach ($segments as $key => &$segment) {
-            $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
-
-            if ($key === 0) {
-                $segment = null;
-            } elseif ($key === 1) {
-                $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liêu</a>';
+            if (empty($request->input('parent_id'))) {
+                $parent = $query->where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
             } else {
-                $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
+                $parent = $query->where('id', $request->input('parent_id'))->first();
+            }
+            $childrens = $parent?->children()->where('is_trash', 0)->get()->reverse(); //reverse()
+
+            $folderPath = $parent?->file_path;
+            if (!empty($folderPath)) {
+                $segments = explode('/', $folderPath);
+
+                foreach ($segments as $key => &$segment) {
+                    $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
+
+                    if ($key === 0) {
+                        $segment = null;
+                    } elseif ($key === 1) {
+                        $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liêu</a>';
+                    } else {
+                        $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
                         <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
                     </span>'.'<a href="#" class="show-children" data-id="'.$fileManager?->id.'">'.$segment.'</a>';
-            }
+                    }
 
+                }
+                $finalPath = implode('', $segments);
+            }
         }
 
-
-        $finalPath = implode('', $segments);
+        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens'))->render();
         return response()->json([
             'view' => $view,
             'folder_path' => $finalPath,
-            'count_children' => $childrens->count(),
+            'count_children' => $childrens?->count(),
         ]);
 //        return view('file-manager::pages.file-manager.components.folder', compact('childrens'));
     }
@@ -62,7 +70,7 @@ class AjaxController extends Controller
             $name = $request->input('name');
             if (empty($request->input('parent_id'))) {
                 $parent = FileManager::where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
-            }else {
+            } else {
                 $parent = FileManager::find($request->input('parent_id'));
             }
             $path = $parent->file_path."/$name";
@@ -95,7 +103,7 @@ class AjaxController extends Controller
     public function uploadFile(Request $request)
     {
         $request->validate([
-            'files.*'    => 'required|mimes:doc,csv,xlsx,xls,docx,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
+            'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
 
             'parent_id' => ['required', 'integer'],
         ]);
@@ -148,24 +156,58 @@ class AjaxController extends Controller
     public function trash(Request $request)
     {
         $request->validate([
-            'id' => ['required','integer'],
-            'value' => ['required',  Rule::in(['0','1'])]
+            'id' => ['required', 'integer'],
+            'value' => ['required', Rule::in(['0', '1'])],
+            'is_direct_deleted' => ['required', Rule::in(['0', '1'])]
         ]);
         try {
             $file = FileManager::findOrFail($request->input('id'));
-            $this->updateIsTrash($file,$request->input('value'));
-        }catch (\Exception $exception){
+            $root = FileManager::root();
+            if ($file->parent->is_direct_deleted){
+                $originalFilePath = $file->file_path;
+                $destinationDirectory = $root->file_path;
+                $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
+                $destinationPath = $destinationDirectory .'/'. $filename;
+                Storage::move($originalFilePath, $destinationPath);
+                $file->update([
+                    'parent_id' => $root->id,
+                    'file_path' => $root->file_path.'/'.$file->name,
+                ]);
+            }
+            $file->update([
+                'is_direct_deleted' => $request->input('is_direct_deleted'),
+            ]);
+            $this->updateIsTrash($file, $request->input('value'));
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'id' => ['required'],
+        ]);
+        try {
+            $file = FileManager::find($request->input('id'));
+            $path = storage_path('app/'.$file->file_path);
+            if (Storage::exists($path)) {
+                Storage::deleteDirectory($path);
+            }
+//            $file->delete();
+        } catch (\Exception $exception) {
             return $exception->getMessage();
         }
     }
 
 
-    private function updateIsTrash(FileManager $fileManager, $value){
+    private function updateIsTrash(FileManager $fileManager, $value)
+    {
         $fileManager->update([
             'is_trash' => $value,
         ]);
-        foreach ($fileManager->children as $child){
-            $this->updateIsTrash($child,$value);
+        foreach ($fileManager->children as $child) {
+            $this->updateIsTrash($child, $value);
         }
     }
 

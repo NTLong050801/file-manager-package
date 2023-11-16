@@ -23,6 +23,7 @@ class FileManager extends Model
         'parent_id',
         'user_id',
         'is_trash',
+        'is_direct_deleted',
     ];
 
     public function user(): BelongsTo
@@ -35,12 +36,28 @@ class FileManager extends Model
         return $this->hasMany(FileManager::class, 'parent_id');
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(FileManager::class, 'parent_id');
+    }
+
+    public static function root(){
+        return FileManager::whereNull('parent_id')->where('parent_id',auth()->id())->first();
+    }
+
     protected function fileSize(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $this->formatFileSize($value),
         );
     }
+
+//    protected function filePath(): Attribute
+//    {
+//        return Attribute::make(
+//            get: fn ($value) => 'app/'.$value,
+//        );
+//    }
 
     private function formatFileSize($bytes): string
     {

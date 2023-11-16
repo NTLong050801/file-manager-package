@@ -1,4 +1,4 @@
-@if($childrens->count() > 0)
+@if(!empty($childrens) && $childrens->count() > 0 )
     @foreach($childrens as $children)
         <tr class="even"data-id="{{$children->id}}">
             <!--begin::Checkbox-->
@@ -67,23 +67,36 @@
                         <!--begin::Menu-->
                         <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
                              data-kt-menu="true" style=" position: absolute;z-index: 100;right:50px">
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
-                            </div>
-                            <!--end::Menu item-->
+                            @if(!$children->is_direct_deleted)
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
+                                       data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3 =">
+                                    <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
+                                </div>
+                                <!--end::Menu item-->
+                            @else
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3 restore" >Khôi phục</a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3 text-danger destroy">Xoá vĩnh viễn</a>
+                                </div>
+                                <!--end::Menu item-->
+                            @endif
 
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
-                                   data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
-                            </div>
-                            <!--end::Menu item-->
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-3 =">
-                                <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
-                            </div>
-                            <!--end::Menu item-->
                         </div>
                         <!--end::Menu-->
                         <!--end::More-->

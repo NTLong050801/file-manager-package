@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('file_manager')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users');
             $table->boolean('is_trash')->default(false);
+            $table->boolean('is_direct_deleted')->default(false);
             $table->timestamps();
         });
         $users = \App\Models\User::all();

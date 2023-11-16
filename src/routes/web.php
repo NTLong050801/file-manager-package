@@ -16,4 +16,5 @@ Route::prefix('ajax')->group(function (){
    Route::get('/download-file',[AjaxController::class,'downloadFile'])->name('ajax.download-file');
 
    Route::patch('/put-file-trash',[AjaxController::class,'trash'])->name('ajax.put-file-trash');
+   Route::delete('/destroy',[AjaxController::class,'destroy'])->name('ajax.destroy');
 });

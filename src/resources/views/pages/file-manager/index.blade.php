@@ -12,16 +12,20 @@
         <!--begin::Card header-->
         <div class="card-header pt-8">
             <div class="card-title">
-                <!--begin::Search-->
-                <div class="d-flex align-items-center position-relative my-1">
-                    <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
-                    <span class="svg-icon svg-icon-1 position-absolute ms-6">
-							<img src="{{asset('assets/media/icons/duotune/general/gen021.svg')}}" alt="">
-						</span>
-                    <!--end::Svg Icon-->
-                    <input type="text" data-kt-filemanager-table-filter="search" class="form-control form-control-solid w-250px ps-15" placeholder="Search Files &amp; Folders">
-                </div>
-                <!--end::Search-->
+                <ul class="nav nav-tabs" id="myTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#" data-type="all-folder">Tất cả (<span id="all_folder_count">19</span>)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#" data-type="deleted-folder">Đã xoá (<span id="">14</span>)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#" data-type="my-folder">Tài liệu cá nhân (<span id="">5</span>)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#" data-type="share-folder">Tài liệu được chia sẻ (<span id="locked-users-count">5</span>)</a>
+                    </li>
+                </ul>
             </div>
             <!--begin::Card toolbar-->
             <div class="card-toolbar">
@@ -473,7 +477,7 @@
         let userId = {{auth()->id()}};
         let rowId;
         let tr;
-
+        let navItemType = "all-folder";
         $('#btn_store_folder').on('click', function () {
             const name = $('#name_folder').val();
             if (!name) {
@@ -491,8 +495,20 @@
         $(document).on('click', '.show-children', function (e) {
             e.preventDefault();
             parentId = $(this).data('id');
-            // console.log(parentId)
             loadFolder(parentId)
+        })
+
+        $('.nav-link').on('click',function () {
+            $('.nav-link').removeClass('active')
+            $(this).addClass('active')
+            navItemType = $(this).data('type')
+            if (navItemType === "deleted-folder" || navItemType === "share-folder"){
+                $('.card-toolbar').hide()
+            }else{
+                $('.card-toolbar').show()
+            }
+            parentId = {{$parent->id}};
+            loadFolder();
         })
 
 //         $(document).on('click', function (event) {
@@ -575,7 +591,6 @@
         })
 
         $(document).on('click','.delete',function(){
-
             Swal.fire({
                 text: `Bạn có chắc muốn xoá thư mục/bản ghi này?`,
                 icon: "warning",
@@ -592,8 +607,55 @@
                     let formData = new FormData();
                     formData.append('id',rowId);
                     formData.append('value',1);
+                    formData.append('is_direct_deleted',1);
                     formData.append('_method','PATCH');
                     putTrashFolder(formData)
+                }
+            });
+        })
+
+        $(document).on('click','.restore',function () {
+            Swal.fire({
+                text: `Bạn có chắc muốn khôi phục?`,
+                icon: "warning",
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Có",
+                cancelButtonText: "Huỷ",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger"
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append('id',rowId);
+                    formData.append('value',0);
+                    formData.append('is_direct_deleted',0);
+                    formData.append('_method','PATCH');
+                    putTrashFolder(formData)
+                }
+            });
+        })
+
+        $(document).on('click','.destroy',function () {
+            Swal.fire({
+                text: `Bạn có chắc muốn xoá vĩnh viễn?`,
+                icon: "warning",
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Có",
+                cancelButtonText: "Huỷ",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger"
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let formData = new FormData();
+                    formData.append('id',rowId);
+                    formData.append('_method','DELETE');
+                    destroyFolder(formData)
                 }
             });
         })
@@ -618,7 +680,6 @@
                 },
             });
         }
-
         const loadFolder = () => {
             $.ajax({
                 url: "/ajax/children",
@@ -626,6 +687,7 @@
                 data: {
                     'parent_id': parentId,
                     'user_id': userId,
+                    'type': navItemType,
                 },
                 success: function (response) {
                     // console.log(response.count_children)
@@ -636,7 +698,6 @@
                 }
             })
         }
-
         const createFolder = (formData) => {
             $.ajax({
                 url: "{{route('ajax.store-folder')}}",
@@ -685,7 +746,22 @@
                 success: function () {
                     loadFolder()
                     showToast("Xoá thành công", null, 'success')
-                    // $('#kt_modal_upload').modal('hide')
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
+            });
+        }
+        const destroyFolder = (formData) => {
+            $.ajax({
+                url: '{{route('ajax.destroy')}}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    loadFolder()
+                    showToast("Xoá thành công", null, 'success')
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

@@ -26,6 +26,8 @@ class FileManager extends Model
         'is_direct_deleted',
     ];
 
+    public array $arrayFilePath = [];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -69,14 +71,15 @@ class FileManager extends Model
         return round($bytes, 2) . ' ' . $units[$pow];
     }
 
-    public function childFiles($filePath): array
+    public function getPathFileIsTrash(FileManager $fileManager, bool $isTrash = false)
     {
-        $files = Storage::files($filePath);
-        $childDirectories = Storage::directories($filePath);
-        foreach ($childDirectories as $childDirectory) {
-            $files = array_merge($files,$this->childFiles($childDirectory));
+        foreach ($fileManager->children as $child) {
+            if ($child->is_trash == $isTrash && !empty($child->file_type)) {
+                $this->arrayFilePath[] = $child->file_path;
+            }
+            $this->getPathFileIsTrash($child);
         }
-        return $files;
+        return $this->arrayFilePath;
     }
 
 }

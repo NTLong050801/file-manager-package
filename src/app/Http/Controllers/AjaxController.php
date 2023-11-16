@@ -19,8 +19,11 @@ class AjaxController extends Controller
     {
         $query = FileManager::query();
         $finalPath = null;
-        if ($request->input('type') == 'deleted-folder') {
+        $type = $request->input('type');
+        $isTrash = false;
+        if ($type == 'deleted-folder') {
             $childrens = $query->where('user_id', $request->input('user_id'))->where('is_direct_deleted', 1)->get();
+            $isTrash = true;
         } else {
             if (empty($request->input('parent_id'))) {
                 $parent = $query->where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
@@ -51,7 +54,7 @@ class AjaxController extends Controller
             }
         }
 
-        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens'))->render();
+        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens','isTrash'))->render();
         return response()->json([
             'view' => $view,
             'folder_path' => $finalPath,
@@ -90,14 +93,28 @@ class AjaxController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string'],
-            'file_manager' => ['required', 'integer']
+            'id' => ['required', 'integer']
         ]);
-        $file = FileManager::findOrFail($request->input('file_manager'));
-        if (!empty($file)) {
+        try {
+            $file = FileManager::findOrFail($request->input('id'));
+            $currentFilePath = $file->file_path;
+            $newFileName = $request->input('name');
+            $directory = pathinfo($currentFilePath, PATHINFO_DIRNAME);
+            $newFilePath = $directory.'/'.$newFileName;
+            if (!empty($file->file_type)) {
+                $newFilePath = $newFilePath.".$file->file_type";
+            }
+            Storage::move($currentFilePath, $newFilePath);
+
             $file->update([
-                'name' => $request->input('name'),
+                'name' => $newFileName,
+                'file_path' => $newFilePath,
             ]);
+            $this->updateFilePathWhenRename($file, $currentFilePath, $newFilePath);
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
         }
+
     }
 
     public function uploadFile(Request $request)
@@ -113,14 +130,14 @@ class AjaxController extends Controller
             // Get the file size in bytes
             $fileSize = $file->getSize();
             $fileType = $file->getClientOriginalExtension();
-            $name = $file->getClientOriginalName();
-
-            Storage::putFileAs($path, $file, $name);
+            $originalName = $file->getClientOriginalName();
+            $name = pathinfo($originalName, PATHINFO_FILENAME);
+            Storage::putFileAs($path, $file, $originalName);
 
             // For example, assuming you have a FileManager model:
             FileManager::create([
                 'name' => $name,
-                'file_path' => $path.'/'.$name,
+                'file_path' => $path.'/'.$originalName,
                 'file_type' => $fileType,
                 'file_size' => $fileSize,
                 'parent_id' => $parentId,
@@ -133,17 +150,20 @@ class AjaxController extends Controller
     public function downloadFile(Request $request)
     {
         $request->validate([
-            'id' => ['required', 'integer']
+            'id' => ['required', 'integer'],
+            'type' => ['required',Rule::in(['all-folder', 'deleted-folder'])]
         ]);
         $file = FileManager::findOrFail($request->input('id'));
         $path = $file->file_path;
+        $isTrash = ($request->input('type') === 'deleted-folder');
+        
         if (Storage::exists($path)) {
             if (empty($file->file_type)) {
                 $pathZip = storage_path('app/'.$file->name.'.zip');
                 if (Storage::exists($pathZip)) {
                     Storage::delete($pathZip);
                 }
-                DownloadFileJob::dispatch($file)->delay(now()->addSeconds(30));
+                DownloadFileJob::dispatch($file,$isTrash)->delay(now()->addSeconds(30));
                 return response()->download($pathZip)->deleteFileAfterSend();
             } else {
                 return response()->download(storage_path('app/'.$path));
@@ -163,11 +183,11 @@ class AjaxController extends Controller
         try {
             $file = FileManager::findOrFail($request->input('id'));
             $root = FileManager::root();
-            if ($file->parent->is_direct_deleted){
+            if ($file->parent->is_direct_deleted) {
                 $originalFilePath = $file->file_path;
                 $destinationDirectory = $root->file_path;
                 $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
-                $destinationPath = $destinationDirectory .'/'. $filename;
+                $destinationPath = $destinationDirectory.'/'.$filename;
                 Storage::move($originalFilePath, $destinationPath);
                 $file->update([
                     'parent_id' => $root->id,
@@ -190,11 +210,13 @@ class AjaxController extends Controller
         ]);
         try {
             $file = FileManager::find($request->input('id'));
-            $path = storage_path('app/'.$file->file_path);
-            if (Storage::exists($path)) {
-                Storage::deleteDirectory($path);
+            $filePath = $file->file_path;
+            if (!empty($filePath)) {
+                Storage::delete($filePath);
+            } else {
+                Storage::deleteDirectory($filePath);
             }
-//            $file->delete();
+            $file->delete();
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
@@ -208,6 +230,18 @@ class AjaxController extends Controller
         ]);
         foreach ($fileManager->children as $child) {
             $this->updateIsTrash($child, $value);
+        }
+    }
+
+    private function updateFilePathWhenRename(FileManager $fileManager, $oldFilePath, $newFilePath)
+    {
+        foreach ($fileManager->children as $child) {
+            $path = $child->file_path;
+            $newPath = str_replace($oldFilePath, $newFilePath, $path);
+            $child->update([
+                'file_path' => $newPath,
+            ]);
+            $this->updateFilePathWhenRename($child, $oldFilePath, $newFilePath);
         }
     }
 

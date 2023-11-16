@@ -47,7 +47,7 @@
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->
             <td>
-                @if(sizeof($children->childFiles($children->file_path)) > 0 || !empty($children->file_type))
+                @if(sizeof($children->getPathFileIsTrash($children, $isTrash)) > 0 || !empty($children->file_type))
                     <button class="btn btn-sm btn-success download">Tải</button>
                 @endif
             </td>

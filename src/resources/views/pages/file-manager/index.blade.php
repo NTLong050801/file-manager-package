@@ -12,20 +12,21 @@
         <!--begin::Card header-->
         <div class="card-header pt-8">
             <div class="card-title">
-                <ul class="nav nav-tabs" id="myTabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#" data-type="all-folder">Tất cả (<span id="all_folder_count">19</span>)</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#" data-type="deleted-folder">Đã xoá (<span id="">14</span>)</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#" data-type="my-folder">Tài liệu cá nhân (<span id="">5</span>)</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#" data-type="share-folder">Tài liệu được chia sẻ (<span id="locked-users-count">5</span>)</a>
-                    </li>
-                </ul>
+                <div class="input-group">
+                    <select
+                        class="form-select w-200px"
+                        id="type_folder"
+                        name="type_folder"
+                        data-tags="false"
+                        data-control="select2"
+                        data-placeholder="Tất cả"
+                    >
+                        <option value="all-folder">Tất cả</option>
+                        <option value="deleted-folder">Đã xoá</option>
+                        <option value="my-folder">Tài liệu cá nhân</option>
+                        <option value="share-folder">Tài liệu được chia sẻ</option>
+                    </select>
+                </div>
             </div>
             <!--begin::Card toolbar-->
             <div class="card-toolbar">
@@ -498,10 +499,10 @@
             loadFolder(parentId)
         })
 
-        $('.nav-link').on('click',function () {
-            $('.nav-link').removeClass('active')
-            $(this).addClass('active')
-            navItemType = $(this).data('type')
+        $('#type_folder').on('change',function () {
+            // $('.nav-link').removeClass('active')
+            // $(this).addClass('active')
+            navItemType = $(this).val()
             if (navItemType === "deleted-folder" || navItemType === "share-folder"){
                 $('.card-toolbar').hide()
             }else{
@@ -555,7 +556,7 @@
             } else {
                 let formData = new FormData();
                 formData.append('name', name)
-                formData.append('file_manager', rowId)
+                formData.append('id', rowId)
                 formData.append('_method', 'PATCH')
                 renameFile(formData)
                 tr.find('.show-children').text(name)
@@ -585,8 +586,7 @@
         });
         $(document).on('click','.download',function () {
             const id = $(this).closest('tr').data('id');
-            let downloadUrl = "{{ route('ajax.download-file', ['id' => 'valueId']) }}";
-            downloadUrl = downloadUrl.replace('valueId', id);
+            let downloadUrl = "/ajax/download-file?id="+id+"&type="+navItemType;
             window.open(downloadUrl, '_blank');
         })
 

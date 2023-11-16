@@ -18,12 +18,15 @@ class DownloadFileJob implements ShouldQueue
 
     protected FileManager $fileManager;
 
+    protected bool $isTrash;
+
     /**
      * Create a new job instance.
      */
-    public function __construct(FileManager $fileManager)
+    public function __construct(FileManager $fileManager, bool $isTrash = false)
     {
         $this->fileManager = $fileManager;
+        $this->isTrash = $isTrash;
     }
 
     /**
@@ -34,8 +37,8 @@ class DownloadFileJob implements ShouldQueue
         try {
             $path = $this->fileManager->file_path;
             $zip = new ZipArchive();
-            $files = $this->fileManager->childFiles($path);
-            $pathZip = storage_path('app/'. $this->fileManager->name.'.zip');
+            $files = $this->fileManager->getPathFileIsTrash($this->fileManager,$this->isTrash);
+            $pathZip = storage_path('app/'.$this->fileManager->name.'.zip');
             if ($zip->open($pathZip, ZipArchive::CREATE) === true) {
                 foreach ($files as $file) {
                     $zip->addFile(storage_path('app/'.$file), str_replace($path.'/', '', $file));

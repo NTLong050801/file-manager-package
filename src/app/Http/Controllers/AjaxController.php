@@ -21,12 +21,13 @@ class AjaxController extends Controller
         $finalPath = null;
         $type = $request->input('type');
         $isTrash = false;
+        $userId = $request->input('user_id');
         if ($type == 'deleted-folder') {
-            $childrens = $query->where('user_id', $request->input('user_id'))->where('is_direct_deleted', 1)->get();
+            $childrens = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
             $isTrash = true;
         } else {
             if (empty($request->input('parent_id'))) {
-                $parent = $query->where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
+                $parent = $query->where('user_id', $userId)->whereNull('parent_id')->first();
             } else {
                 $parent = $query->where('id', $request->input('parent_id'))->first();
             }
@@ -53,8 +54,12 @@ class AjaxController extends Controller
                 $finalPath = implode('', $segments);
             }
         }
-
-        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens','isTrash'))->render();
+        $user = User::find($userId);
+        $users = User::where('company_id',$user->company_id)->get();
+        $users = $users->reject(function ($user) use ($userId) {
+            return $user->id == $userId;
+        });
+        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens','isTrash','users'))->render();
         return response()->json([
             'view' => $view,
             'folder_path' => $finalPath,
@@ -227,6 +232,20 @@ class AjaxController extends Controller
         }
     }
 
+    public function permission(Request $request){
+        $request->validate([
+           'user_id' => ['required','integer'],
+           'file_id' => ['required','integer'],
+        ]);
+        try {
+            $file = FileManager::find($request->input('file_id'));
+            $user = User::find($request->input('user_id'));
+            $this->updatePermission($file,$user);
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+    }
+
 
     private function updateIsTrash(FileManager $fileManager, $value)
     {
@@ -265,6 +284,13 @@ class AjaxController extends Controller
                 ]);
             }
             $this->destroyFileIsDirectDeleted($child);
+        }
+    }
+
+    private function updatePermission(FileManager $fileManager, User $user){
+        $fileManager->users()->toggle($user);
+        foreach ($fileManager->children as $child){
+            $this->updatePermission($child,$user);
         }
     }
 }

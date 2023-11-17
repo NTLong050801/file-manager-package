@@ -45,18 +45,18 @@
                                     <img src="{{asset('assets/media/icons/duotune/files/fil003.svg')}}" alt="">
                                 </span>
                                 <!--end::Svg Icon-->
-                            @break
+                                @break
                         @endswitch
 
                     @endif
 
-                    <a href="#" class="text-gray-800 text-hover-primary show-children" data-id="{{$children->id}}">{{$children->name}}</a>
+                    <a href="#" class="text-gray-800 text-hover-primary ms-5 show-children" data-id="{{$children->id}}">{{$children->name}}</a>
                 </div>
             </td>
             <!--end::Name=-->
             <td>
                 <div>
-                    <img src="{{$children->user->avatar}}" class="rounded-circle w-100px" alt=""
+                    <img src="{{$children->user->avatar}}" width="30" height="30" class="rounded-circle" alt=""
                          data-bs-toggle="tooltip" data-bs-placement="top" title="{{$children->user->name}}"
                     >
                 </div>
@@ -64,7 +64,53 @@
             <!--begin::Size-->
             <td>{{empty($children->file_type) ? null : $children->file_size}}</td>
             <!--end::Size-->
-            <td></td>
+            <td>
+                <button class="btn btn-sm btn-primary add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}">Thêm</button>
+                <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="card-title">
+                                    <h3 class="modal-title" style="color: #242C8A">Thêm quyền cho tệp "{{$children->name}}"</h3>
+                                </div>
+                                <div class="card-toolbar">
+                                    <div class="position-relative">
+                                        <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                        <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                            <img src="{{asset('assets/media/icons/duotune/general/gen021.svg')}}" alt="">
+                                        </span>
+                                        <!--end::Svg Icon-->
+                                        <input type="text" class="form-control-sm ps-10 border-black rounded-pill w-300px input_keyword" name="keyword" placeholder="Tên người dùng" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row justify-content-start">
+                                    @foreach($users as $user)
+                                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 block-user" style="display: flex">
+                                            <div class="col-3 col-md-2 col-sm-4 align-self-center">
+                                                <label for="mail_receiver" class="form-check form-check-custom me-10">
+                                                    <input class="form-check-input border-black h-20px w-20px receiver-checkbox" data-id="{{$user->id}}" value="{{$user->id}}" type="checkbox"
+                                                           name="receiver[]" @if(in_array($user->id,$children->users->pluck('id')->toArray())) checked @endif >
+                                                </label>
+                                            </div>
+                                            <div class="col-9 col-md-9 col-sm-9 d-flex align-items-center col-md-10 col-sm-12">
+                                                <a href="#" class="symbol symbol-50px">
+                                                    <span class="symbol-label" style="background-image:url({{$user->avatar}});"></span>
+                                                </a>
+                                                <div class="ms-5 d-flex flex-column">
+                                                    <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->name}}</a>
+                                                    <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->username}}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
             <!--begin::Last modified-->
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->

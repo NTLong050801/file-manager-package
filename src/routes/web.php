@@ -17,4 +17,6 @@ Route::prefix('ajax')->group(function (){
 
    Route::patch('/put-file-trash',[AjaxController::class,'trash'])->name('ajax.put-file-trash');
    Route::delete('/destroy',[AjaxController::class,'destroy'])->name('ajax.destroy');
+
+   Route::post('/update-permission',[AjaxController::class,'permission'])->name('ajax.update-permission');
 });

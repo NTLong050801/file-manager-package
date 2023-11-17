@@ -123,8 +123,8 @@
                                         <th class="min-w-100px sorting_disabled" rowspan="1" colspan="1">Người tạo</th>
                                         <th class="min-w-100px sorting_disabled" rowspan="1" colspan="1">Kích thước</th>
                                         <th class="min-w-150px sorting_disabled" rowspan="1" colspan="1">Phân quyền</th>
-                                        <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Ngày tạo</th>
-                                        <th class="min-w-125px sorting_disabled" rowspan="1" colspan="1">Tải xuống</th>
+                                        <th class="min-w-100px sorting_disabled" rowspan="1" colspan="1">Ngày tạo</th>
+                                        <th class="min-w-60px sorting_disabled" rowspan="1" colspan="1">Tải xuống</th>
                                         <th class="w-50px sorting_disabled" rowspan="1" colspan="1"></th>
                                     </tr>
                                     <!--end::Table row-->
@@ -474,11 +474,17 @@
 <script>
     $(document).ready(function () {
         let parentId = {{$parent->id}};
-        let csrfToken = "{{ csrf_token() }}";
+        {{--let csrfToken = "{{ csrf_token() }}";--}}
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         let userId = {{auth()->id()}};
         let rowId;
         let tr;
         let navItemType = "all-folder";
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        });
         $('#btn_store_folder').on('click', function () {
             const name = $('#name_folder').val();
             if (!name) {
@@ -526,20 +532,19 @@
 //         });
 
 
-        $(document).on('click', '.menu-toggle', function () {
+        $(document).on('click', '.menu-toggle, .add-permission', function () {
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
-            const closest = $(this).closest('.more');
-            rowId = closest.data('id');
             tr = $(this).closest('tr');
-            // Find the menu within the closest ancestor
-            const targetMenu = closest.find('.menu');
+            rowId = tr.data('id');
 
-            // Hide all other menus except the one associated with the clicked button
-            $('.menu-sub-dropdown').not(targetMenu).removeClass('show');
+            if ($(this).hasClass('menu-toggle')){
+                const closest = $(this).closest('.more');
+                const targetMenu = closest.find('.menu');
 
-            // Toggle the visibility of the menu
-            if (targetMenu.hasClass('menu-sub-dropdown')) {
-                targetMenu.toggleClass('show');
+                $('.menu-sub-dropdown').not(targetMenu).removeClass('show');
+                if (targetMenu.hasClass('menu-sub-dropdown')) {
+                    targetMenu.toggleClass('show');
+                }
             }
         });
 
@@ -659,6 +664,41 @@
                 }
             });
         })
+
+        $(document).on('keyup','.input_keyword',function(){
+            const searchText = $(this).val().toLowerCase();
+            $(this).closest('.modal').find(".block-user").each(function() {
+                const username = $(this).find(".name-user").text().toLowerCase();
+                if (username.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        })
+
+        $(document).on('change','.receiver-checkbox',function () {
+            let userId = $(this).data('id');
+            let is_active = $(this).prop("checked");
+            if (is_active === true) {
+                is_active = 1;
+            } else is_active = 0;
+            $.ajax({
+                url: '{{route('ajax.update-permission')}}',
+                method: 'POST',
+                data: {
+                    _token: csrfToken,
+                    user_id: userId,
+                    file_id: rowId,
+                },
+                success: function (response) {
+                    showToast('Thành công', 'Đã cập nhật thành công', 'success')
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
+            });
+        })
         const renameFile = (formData) => {
             $.ajax({
                 url: "{{route('ajax.rename')}}",
@@ -666,18 +706,15 @@
                 method: 'post',
                 processData: false,
                 contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
                 success: function (response) {
                     $('#rename_modal').modal('hide')
                     $('#name_folder_rename').val('')
                     // loadFolder(parentId)
                     showToast('Sửa thành công', null, 'success')
                 },
-                error: function (error) {
-                    console.log(error)
-                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
             });
         }
         const loadFolder = () => {
@@ -695,6 +732,9 @@
                     $('#folder_path').html(response.folder_path)
                     $('#count_item').html(response.count_children.toString() + ' items')
                     $('[data-bs-toggle="tooltip"]').tooltip();
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
                 }
             })
         }
@@ -705,18 +745,15 @@
                 method: 'post',
                 processData: false,
                 contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
                 success: function (response) {
                     $('#create_folder_modal').modal('hide')
                     $('#name_folder').val('')
                     loadFolder(parentId)
                     showToast('Tạo thư mục thành công', null, 'success')
                 },
-                error: function (error) {
-                    console.log(error)
-                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
             });
         }
         const uploadFile = (formData) => {

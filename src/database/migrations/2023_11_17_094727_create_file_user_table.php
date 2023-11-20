@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('file_user', function (Blueprint $table) {
             $table->foreignId('file_id')->constrained('file_manager')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-
+            $table->boolean('is_click_permission')->default(false);
             $table->unique(['file_id', 'user_id']);
         });
     }

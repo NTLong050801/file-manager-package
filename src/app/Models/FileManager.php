@@ -26,7 +26,11 @@ class FileManager extends Model
         'is_trash',
         'is_direct_deleted',
     ];
-
+    const TYPE_ALL_FOLDER= 'all-folder';
+    const TYPE_DELETE_FOLDER = 'deleted-folder';
+    const TYPE_PRIVATE_FOLDER = 'private-folder';
+    const TYPE_SHARE_FOLDER = 'share-folder';
+    const LIST_TYPE_FOLDER = [self::TYPE_ALL_FOLDER,self::TYPE_DELETE_FOLDER,self::TYPE_PRIVATE_FOLDER,self::TYPE_SHARE_FOLDER];
     public array $arrayFilePath = [];
 
     public function user(): BelongsTo
@@ -36,7 +40,7 @@ class FileManager extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'file_user', 'file_id', 'user_id');
+        return $this->belongsToMany(User::class, 'file_user', 'file_id', 'user_id')->withPivot('is_click_permission');
     }
 
     public function children(): HasMany

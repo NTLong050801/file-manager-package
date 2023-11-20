@@ -23,7 +23,7 @@
                     >
                         <option value="all-folder">Tất cả</option>
                         <option value="deleted-folder">Đã xoá</option>
-                        <option value="my-folder">Tài liệu cá nhân</option>
+                        <option value="private-folder">Tài liệu cá nhân</option>
                         <option value="share-folder">Tài liệu được chia sẻ</option>
                     </select>
                 </div>
@@ -510,11 +510,12 @@
             // $(this).addClass('active')
             navItemType = $(this).val()
             if (navItemType === "deleted-folder" || navItemType === "share-folder"){
+                parentId = null;
                 $('.card-toolbar').hide()
             }else{
                 $('.card-toolbar').show()
+                parentId = {{$parent->id}};
             }
-            parentId = {{$parent->id}};
             loadFolder();
         })
 
@@ -690,6 +691,7 @@
                     _token: csrfToken,
                     user_id: userId,
                     file_id: rowId,
+                    is_active: is_active,
                 },
                 success: function (response) {
                     showToast('Thành công', 'Đã cập nhật thành công', 'success')

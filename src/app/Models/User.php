@@ -1,8 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Ntlong050801\FileManager\app\Models;
 
+use App\Models\Address;
+use App\Models\Company;
+use App\Models\Order;
 use App\Models\Scopes\CurrentCompanyScope;
+use App\Models\Setting;
 use App\Models\Traits\HasActivityTrait;
 use App\Models\Traits\HasNotifiableTrait;
 use App\Models\Traits\HasSlugTrait;
@@ -18,117 +22,15 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @method static where(string $string, $companyId)
  */
-class User extends Authenticatable
+class User extends \App\Models\User
 {
-    use HasApiTokens, HasFactory, Notifiable;
-    use HasRoles;
-    use HasSlugTrait;
-    use HasActivityTrait;
-    use HasNotifiableTrait;
-
-    protected $table = 'users';
-    const TOKEN_DOWNLOAD_DOCUMENT = 'download-document';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'slug',
-        'name',
-        'email',
-        'phone',
-        'username',
-        'password',
-        'company_id',
-        'avatar',
-        'google2fa_secret',
-        'google2fa_enable',
-        'province_id',
-        'district_id',
-        'ward_id',
-        'customer_source',
-        'customer_type',
-        'notification_settings',
-        'is_active',
+        'memory',
+        'used_memory'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'notification_settings' => 'array',
-    ];
-
-    public array $customActivityOptions = [
-        'logExceptAttributes' => ['password','remember_token'],
-    ];
-
-    protected static function booted(): void
+    public function files(): BelongsToMany
     {
-        static::addGlobalScope(new CurrentCompanyScope());
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class, 'order_user', 'user_id', 'order_id');
-    }
-
-    protected function avatar(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if (empty($this->attributes['avatar'])) {
-                    return (new \Laravolt\Avatar\Avatar)->create($this->name)->toBase64();
-                }
-                return asset('storage/'.$this->attributes['avatar']);
-            }
-        );
-    }
-
-    public static function getValueByKey($key, $companyId = null)
-    {
-        $companyId = empty($companyId) ? session('company_id') : $companyId;
-        $setting = Setting::where('company_id', $companyId)->where('key', $key)->get();
-        if (isset($setting->first()->value)) {
-            return $setting->first()->value;
-        }
-    }
-
-    protected function fullAddress(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                return Address::buildFullAddress($this->province_id, $this->district_id, $this->ward_id);
-            }
-        );
-    }
-
-    public function descriptionForActivityEvent()
-    {
-        return fn(string $eventName) => __('activitylog.'.$this->table).$this->name." được ".__('activitylog.'.$eventName);
-    }
-
-    public function generateCodeDownloadDocument(int $orderId): string
-    {
-        return self::TOKEN_DOWNLOAD_DOCUMENT.$orderId;
+        return $this->belongsToMany(FileManager::class, 'file_user', 'user_id', 'file_id')->withPivot('is_click_permission');
     }
 }

@@ -3,63 +3,106 @@
 namespace Ntlong050801\FileManager\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Ntlong050801\FileManager\app\Jobs\DownloadFileJob;
 use Ntlong050801\FileManager\app\Models\FileManager;
-use ZipArchive;
+use Ntlong050801\FileManager\app\Models\User;
+
 
 class AjaxController extends Controller
 {
     public function getChildren(Request $request)
     {
+        $request->validate([
+            'type' => ['required', Rule::in(FileManager::LIST_TYPE_FOLDER)],
+            'user_id' => ['required', 'integer'],
+        ]);
         $query = FileManager::query();
         $finalPath = null;
-        $type = $request->input('type');
         $isTrash = false;
+        $type = $request->input('type');
         $userId = $request->input('user_id');
-        if ($type == 'deleted-folder') {
-            $childrens = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
-            $isTrash = true;
-        } else {
-            if (empty($request->input('parent_id'))) {
-                $parent = $query->where('user_id', $userId)->whereNull('parent_id')->first();
-            } else {
-                $parent = $query->where('id', $request->input('parent_id'))->first();
+        $parentId = $request->input('parent_id');
+        $user = User::find($userId);
+        switch ($type) {
+            case  FileManager::TYPE_DELETE_FOLDER:
+            {
+                $childrens = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
+                $isTrash = true;
+                break;
             }
-            $childrens = $parent?->children()->where('is_trash', 0)->get()->reverse(); //reverse()
-
-            $folderPath = $parent?->file_path;
-            if (!empty($folderPath)) {
-                $segments = explode('/', $folderPath);
-
-                foreach ($segments as $key => &$segment) {
-                    $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
-
-                    if ($key === 0) {
-                        $segment = null;
-                    } elseif ($key === 1) {
-                        $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liêu</a>';
-                    } else {
-                        $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
-                        <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
-                    </span>'.'<a href="#" class="show-children" data-id="'.$fileManager?->id.'">'.$segment.'</a>';
-                    }
-
+            case FileManager::TYPE_PRIVATE_FOLDER:
+            {
+                if (empty($parentId)) {
+                    $parent = $query->where('user_id', $userId)->whereNull('parent_id')->first();
+                } else {
+                    $parent = $query->where('id', $parentId)->first();
                 }
-                $finalPath = implode('', $segments);
+                $childrens = $parent?->children()->where('is_trash', 0)->get()->reverse();
+                $finalPath = $this->processFolderPath($parent);
+                break;
+            }
+            case FileManager::TYPE_SHARE_FOLDER :
+            {
+                $parent = $user->files->where('pivot.is_click_permission', true);
+                if (!empty($parentId)) {
+                    $childrens = $user->files->where('pivot.is_click_permission', false)->where('parent_id',$parentId);
+                }else{
+                    $childrens = $parent;
+                }
+                break;
+            }
+            default :
+            {
+                if (empty($parentId)) {
+                    $parent = $query->where('user_id', $userId)->whereNull('parent_id')->first();
+                } else {
+                    $parent = $query->where('id', $parentId)->first();
+                }
+                $childrens = $parent?->children()->where('is_trash', 0)->get()->reverse();
+                $finalPath = $this->processFolderPath($parent);
             }
         }
-        $user = User::find($userId);
-        $users = User::where('company_id',$user->company_id)->get();
+//        if ($type == FileManager::TYPE_DELETE_FOLDER) {
+//            $childrens = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
+//            $isTrash = true;
+//        } else {
+//            if (empty($request->input('parent_id'))) {
+//                $parent = $query->where('user_id', $userId)->whereNull('parent_id')->first();
+//            } else {
+//                $parent = $query->where('id', $request->input('parent_id'))->first();
+//            }
+//            $childrens = $parent?->children()->where('is_trash', 0)->get()->reverse(); //reverse()
+//
+//            $folderPath = $parent?->file_path;
+//            if (!empty($folderPath)) {
+//                $segments = explode('/', $folderPath);
+//
+//                foreach ($segments as $key => &$segment) {
+//                    $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
+//
+//                    if ($key === 0) {
+//                        $segment = null;
+//                    } elseif ($key === 1) {
+//                        $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liêu</a>';
+//                    } else {
+//                        $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
+//                        <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
+//                    </span>'.'<a href="#" class="show-children" data-id="'.$fileManager?->id.'">'.$segment.'</a>';
+//                    }
+//
+//                }
+//                $finalPath = implode('', $segments);
+//            }
+//        }
+
+        $users = User::where('company_id', $user->company_id)->get();
         $users = $users->reject(function ($user) use ($userId) {
             return $user->id == $userId;
         });
-        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens','isTrash','users'))->render();
+        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens', 'isTrash', 'users','userId'))->render();
         return response()->json([
             'view' => $view,
             'folder_path' => $finalPath,
@@ -80,6 +123,10 @@ class AjaxController extends Controller
                 $parent = FileManager::where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
             } else {
                 $parent = FileManager::find($request->input('parent_id'));
+            }
+            $fileCount = $this->checkExitsNameInFolder($parent->id,$name);
+            if ($fileCount >= 1){
+                return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
             }
             $path = $parent->file_path."/$name";
             Storage::makeDirectory($path);
@@ -102,6 +149,11 @@ class AjaxController extends Controller
         ]);
         try {
             $file = FileManager::findOrFail($request->input('id'));
+            $fileCount = $this->checkExitsNameInFolder($file->parent_id,$request->input('name'));
+
+            if ($fileCount >= 1){
+                return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
+            }
             $currentFilePath = $file->file_path;
             $newFileName = $request->input('name');
             $directory = pathinfo($currentFilePath, PATHINFO_DIRNAME);
@@ -150,8 +202,8 @@ class AjaxController extends Controller
                     'user_id' => $request->input('user_id'),
                 ]);
             }
-        }catch (\Exception $exception){
-           return $exception->getMessage();
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
         }
 
     }
@@ -160,11 +212,11 @@ class AjaxController extends Controller
     {
         $request->validate([
             'id' => ['required', 'integer'],
-            'type' => ['required',Rule::in(['all-folder', 'deleted-folder'])]
+            'type' => ['required', Rule::in(FileManager::LIST_TYPE_FOLDER)]
         ]);
         $file = FileManager::findOrFail($request->input('id'));
         $path = $file->file_path;
-        $isTrash = ($request->input('type') === 'deleted-folder');
+        $isTrash = ($request->input('type') === FileManager::TYPE_DELETE_FOLDER);
 
         if (Storage::exists($path)) {
             if (empty($file->file_type)) {
@@ -172,7 +224,7 @@ class AjaxController extends Controller
                 if (Storage::exists($pathZip)) {
                     Storage::delete($pathZip);
                 }
-                DownloadFileJob::dispatch($file,$isTrash)->delay(now()->addSeconds(30));
+                DownloadFileJob::dispatch($file, $isTrash)->delay(now()->addSeconds(30));
                 return response()->download($pathZip)->deleteFileAfterSend();
             } else {
                 return response()->download(storage_path('app/'.$path));
@@ -232,20 +284,32 @@ class AjaxController extends Controller
         }
     }
 
-    public function permission(Request $request){
+    public function permission(Request $request)
+    {
         $request->validate([
-           'user_id' => ['required','integer'],
-           'file_id' => ['required','integer'],
+            'user_id' => ['required', 'integer'],
+            'file_id' => ['required', 'integer'],
+            'is_active' => ['required', 'boolean'],
         ]);
         try {
             $file = FileManager::find($request->input('file_id'));
+            $parent = $file->parent;
             $user = User::find($request->input('user_id'));
-            $this->updatePermission($file,$user);
-        }catch (\Exception $exception){
+            $isActive = $request->input('is_active');
+            if ($isActive) {
+                $isClickPermission = true;
+                if ($user->files()->wherePivot('file_id', $parent->id)->exists()){
+                    $isClickPermission = false;
+                }
+                $file->users()->attach($user, ['is_click_permission' => $isClickPermission]);
+            } else {
+                $file->users()->detach($user);
+            }
+            $this->updatePermission($file, $user, $isActive);
+        } catch (\Exception $exception) {
             return $exception->getMessage();
         }
     }
-
 
     private function updateIsTrash(FileManager $fileManager, $value)
     {
@@ -269,10 +333,11 @@ class AjaxController extends Controller
         }
     }
 
-    private function destroyFileIsDirectDeleted(FileManager $fileManager){
-        $root =  FileManager::root();
-        foreach ($fileManager->children as $child){
-            if ($child->is_direct_deleted){
+    private function destroyFileIsDirectDeleted(FileManager $fileManager)
+    {
+        $root = FileManager::root();
+        foreach ($fileManager->children as $child) {
+            if ($child->is_direct_deleted) {
                 $originalFilePath = $child->file_path;
                 $destinationDirectory = $root->file_path;
                 $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
@@ -287,10 +352,48 @@ class AjaxController extends Controller
         }
     }
 
-    private function updatePermission(FileManager $fileManager, User $user){
-        $fileManager->users()->toggle($user);
-        foreach ($fileManager->children as $child){
-            $this->updatePermission($child,$user);
+    private function updatePermission(FileManager $fileManager, User $user, bool $isActive = false)
+    {
+        foreach ($fileManager->children as $child) {
+            if ($isActive) {
+                $child->users()->attach($user);
+            } else {
+                $child->users()->detach($user);
+            }
+            $this->updatePermission($child, $user,$isActive);
         }
+    }
+
+    private function processFolderPath(FileManager $parent)
+    {
+        $folderPath = $parent?->file_path;
+        $finalPath = null;
+        if (!empty($folderPath)) {
+            $segments = explode('/', $folderPath);
+
+            foreach ($segments as $key => &$segment) {
+                $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
+
+                if ($key === 0) {
+                    $segment = null;
+                } elseif ($key === 1) {
+                    $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liêu</a>';
+                } else {
+                    $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
+                        <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
+                    </span>'.'<a href="#" class="show-children" data-id="'.$fileManager?->id.'">'.$segment.'</a>';
+                }
+
+            }
+            $finalPath = implode('', $segments);
+        }
+        return $finalPath;
+    }
+
+    private function checkExitsNameInFolder(int $parentId,string $name){
+
+        $files = FileManager::where('parent_id',$parentId)->where('name','LIKE', $name)->get();
+
+        return $files->count();
     }
 }

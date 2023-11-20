@@ -65,51 +65,54 @@
             <td>{{empty($children->file_type) ? null : $children->file_size}}</td>
             <!--end::Size-->
             <td>
-                <button class="btn btn-sm btn-primary add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}">Thêm</button>
-                <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div class="card-title">
-                                    <h3 class="modal-title" style="color: #242C8A">Thêm quyền cho tệp "{{$children->name}}"</h3>
-                                </div>
-                                <div class="card-toolbar">
-                                    <div class="position-relative">
-                                        <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
-                                        <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                @if($children->user_id == $userId)
+                    <button class="btn btn-sm btn-primary add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}">Thêm</button>
+                    <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="card-title">
+                                        <h3 class="modal-title" style="color: #242C8A">Thêm quyền cho tệp "{{$children->name}}"</h3>
+                                    </div>
+                                    <div class="card-toolbar">
+                                        <div class="position-relative">
+                                            <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                            <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
                                             <img src="{{asset('assets/media/icons/duotune/general/gen021.svg')}}" alt="">
                                         </span>
-                                        <!--end::Svg Icon-->
-                                        <input type="text" class="form-control-sm ps-10 border-black rounded-pill w-300px input_keyword" name="keyword" placeholder="Tên người dùng" autocomplete="off">
+                                            <!--end::Svg Icon-->
+                                            <input type="text" class="form-control-sm ps-10 border-black rounded-pill w-300px input_keyword" name="keyword" placeholder="Tên người dùng"
+                                                   autocomplete="off">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row justify-content-start">
-                                    @foreach($users as $user)
-                                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 block-user" style="display: flex">
-                                            <div class="col-3 col-md-2 col-sm-4 align-self-center">
-                                                <label for="mail_receiver" class="form-check form-check-custom me-10">
-                                                    <input class="form-check-input border-black h-20px w-20px receiver-checkbox" data-id="{{$user->id}}" value="{{$user->id}}" type="checkbox"
-                                                           name="receiver[]" @if(in_array($user->id,$children->users->pluck('id')->toArray())) checked @endif >
-                                                </label>
-                                            </div>
-                                            <div class="col-9 col-md-9 col-sm-9 d-flex align-items-center col-md-10 col-sm-12">
-                                                <a href="#" class="symbol symbol-50px">
-                                                    <span class="symbol-label" style="background-image:url({{$user->avatar}});"></span>
-                                                </a>
-                                                <div class="ms-5 d-flex flex-column">
-                                                    <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->name}}</a>
-                                                    <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->username}}</a>
+                                <div class="modal-body">
+                                    <div class="row justify-content-start">
+                                        @foreach($users as $user)
+                                            <div class="col-lg-4 col-md-6 col-sm-12 mb-4 block-user" style="display: flex">
+                                                <div class="col-3 col-md-2 col-sm-4 align-self-center">
+                                                    <label for="mail_receiver" class="form-check form-check-custom me-10">
+                                                        <input class="form-check-input border-black h-20px w-20px receiver-checkbox" data-id="{{$user->id}}" value="{{$user->id}}" type="checkbox"
+                                                               name="receiver[]" @if(in_array($user->id,$children->users->pluck('id')->toArray())) checked @endif >
+                                                    </label>
+                                                </div>
+                                                <div class="col-9 col-md-9 col-sm-9 d-flex align-items-center col-md-10 col-sm-12">
+                                                    <a href="#" class="symbol symbol-50px">
+                                                        <span class="symbol-label" style="background-image:url({{$user->avatar}});"></span>
+                                                    </a>
+                                                    <div class="ms-5 d-flex flex-column">
+                                                        <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->name}}</a>
+                                                        <a href="#" class="text-gray-600 text-hover-primary name-user">{{$user->username}}</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </td>
             <!--begin::Last modified-->
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
@@ -121,55 +124,57 @@
             </td>
             <!--begin::Actions-->
             <td class="text-end" data-kt-filemanager-table="action_dropdown">
-                <div class="d-flex justify-content-end">
-                    <!--begin::More-->
-                    <div class="ms-2 more" data-id="{{$children->id}}">
-                        <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click"
-                                data-kt-menu-placement="bottom-end">
-                            <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
-                            <span class="svg-icon svg-icon-5 m-0">
+                @if($children->user_id == $userId)
+                    <div class="d-flex justify-content-end">
+                        <!--begin::More-->
+                        <div class="ms-2 more" data-id="{{$children->id}}">
+                            <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click"
+                                    data-kt-menu-placement="bottom-end">
+                                <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
+                                <span class="svg-icon svg-icon-5 m-0">
                             <img src="{{asset('assets/media/icons/duotune/general/gen052.svg')}}" alt="">
                         </span>
-                            <!--end::Svg Icon-->
-                        </button>
-                        <!--begin::Menu-->
-                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
-                             data-kt-menu="true" style=" position: absolute;z-index: 100;right:50px">
-                            @if(!$children->is_direct_deleted)
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
-                                </div>
-                                <!--end::Menu item-->
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
-                                       data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
-                                </div>
-                                <!--end::Menu item-->
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3 =">
-                                    <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
-                                </div>
-                                <!--end::Menu item-->
-                            @else
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 restore">Khôi phục</a>
-                                </div>
-                                <!--end::Menu item-->
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 text-danger destroy">Xoá vĩnh viễn</a>
-                                </div>
-                                <!--end::Menu item-->
-                            @endif
+                                <!--end::Svg Icon-->
+                            </button>
+                            <!--begin::Menu-->
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
+                                 data-kt-menu="true" style=" position: absolute;z-index: 100;right:50px">
+                                @if(!$children->is_direct_deleted)
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
+                                           data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3 =">
+                                        <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                @else
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3 restore">Khôi phục</a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3 text-danger destroy">Xoá vĩnh viễn</a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                @endif
 
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::More-->
                         </div>
-                        <!--end::Menu-->
-                        <!--end::More-->
                     </div>
-                </div>
+                @endif
             </td>
             <!--end::Actions-->
         </tr>

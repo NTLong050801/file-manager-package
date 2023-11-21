@@ -54,7 +54,7 @@ class FileManager extends Model
     }
 
     public static function root(){
-        return FileManager::whereNull('parent_id')->first();
+        return FileManager::whereNull('parent_id')->where('user_id',auth()->id())->first();
     }
 
     protected function fileSize(): Attribute

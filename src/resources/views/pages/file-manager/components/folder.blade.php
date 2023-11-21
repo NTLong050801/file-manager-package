@@ -50,7 +50,7 @@
 
                     @endif
 
-                    <a href="#" class="text-gray-800 text-hover-primary ms-5 show-children"
+                    <a href="#" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($children->file_type)) show-children @endif"
                        data-type="{{$children->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$children->id}}">{{$children->name}}</a>
                 </div>
             </td>
@@ -66,7 +66,7 @@
             <td>{{empty($children->file_type) ? null : $children->file_size}}</td>
             <!--end::Size-->
             <td>
-                @if($children->user_id == $userId)
+                @if($children->user_id == $userId && !$children->is_trash)
                     <button class="btn btn-sm btn-primary add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}">Thêm</button>
                     <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-scrollable">

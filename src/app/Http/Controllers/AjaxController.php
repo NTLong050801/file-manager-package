@@ -26,7 +26,7 @@ class AjaxController extends Controller
         $type = $request->input('type');
         $userId = auth()->id();
         $parentId = $request->input('parent_id');
-        $user = auth()->user();
+        $user = User::find($userId);
         switch ($type) {
             case  FileManager::TYPE_DELETE_FOLDER:
             {
@@ -60,27 +60,26 @@ class AjaxController extends Controller
             }
             default :
             {
-
-                if (!empty($parentId) && $parentId != (FileManager::where('user_id', $userId)->whereNull('parent_id')->first()->id)){
-                    if (!empty($user->files) && $user->files->where('pivot.file_id',$parentId)->count()> 0){
+                if (!empty($parentId) && $parentId != (FileManager::where('user_id', $userId)->whereNull('parent_id')->first()->id)) {
+                    if (!empty($user->files) && $user->files->where('pivot.file_id', $parentId)->count() > 0) {
                         $childrens = $user->files->where('pivot.is_click_permission', false)->where('parent_id', $parentId)->where('is_trash', false);
                         $finalPath = $this->processFolderPath(FileManager::find($parentId));
-                    }else{
+                    } else {
                         $parent = $query->where('id', $parentId)->first();
                         $childrens = $parent?->children()->where('is_trash', false)->get()->reverse();
                         $finalPath = $this->processFolderPath($parent);
                     }
-                }else{
+                } else {
                     $childrens = FileManager::where(function ($query) use ($userId, $parentId) {
+
                         // Các file thuộc sở hữu của bạn
-                        if (empty($parentId)){
+                        if (empty($parentId)) {
                             $parentId = FileManager::root()->id;
                         }
-                        $query->where('user_id', $userId)->where('parent_id',$parentId);
-
+                        $query->where('user_id', $userId)->where('parent_id', $parentId);
                         // Các file được chia sẻ với bạn
                         $query->orWhereHas('users', function ($query) use ($userId) {
-                            $query->where('user_id', $userId)->where('is_click_permission', true);
+                            $query->where('user_id', $userId)->where('is_click_permission', true)->where('is_trash', false);
                         });
                     })->get();
                 }
@@ -134,7 +133,7 @@ class AjaxController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string'],
-            'id' => ['required', 'integer']
+            'id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
         ]);
         try {
             $file = FileManager::findOrFail($request->input('id'));
@@ -167,7 +166,6 @@ class AjaxController extends Controller
     {
         $request->validate([
             'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
-
             'parent_id' => ['required', 'integer'],
         ]);
         try {
@@ -198,7 +196,6 @@ class AjaxController extends Controller
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
-
     }
 
     public function downloadFile(Request $request)
@@ -238,14 +235,13 @@ class AjaxController extends Controller
     public function trash(Request $request)
     {
         $request->validate([
-            'id' => ['required', 'integer'],
+            'id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
             'value' => ['required', Rule::in(['0', '1'])],
             'is_direct_deleted' => ['required', Rule::in(['0', '1'])]
         ]);
         try {
             $file = FileManager::findOrFail($request->input('id'));
             $root = FileManager::root();
-
             if ($file->parent->is_direct_deleted) {
                 $originalFilePath = $file->file_path;
                 $destinationDirectory = $root->file_path;
@@ -269,7 +265,7 @@ class AjaxController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'id' => ['required'],
+            'id' => ['required',  Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
         ]);
         try {
             $file = FileManager::find($request->input('id'));
@@ -289,13 +285,14 @@ class AjaxController extends Controller
     public function permission(Request $request)
     {
         $request->validate([
-            'file_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
+            'file_id' => ['required', 'integer',  Rule::in(User::find(auth()->id())->file->where('is_trash',false)->pluck('id')->toArray())],
             'is_active' => ['required', 'boolean'],
         ]);
         try {
             $file = FileManager::find($request->input('file_id'));
             $parent = $file->parent;
-            $user = auth()->user();
+            $user = User::find($request->input('user_id'));
             $isActive = $request->input('is_active');
             if ($isActive) {
                 $isClickPermission = true;

@@ -33,4 +33,9 @@ class User extends \App\Models\User
     {
         return $this->belongsToMany(FileManager::class, 'file_user', 'user_id', 'file_id')->withPivot('is_click_permission');
     }
+
+    public function file(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FileManager::class, 'user_id');
+    }
 }

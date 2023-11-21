@@ -551,7 +551,7 @@
         });
 
         $(document).on('click', '.rename', function () {
-            const name = tr.find('.show-children').text()
+            const name = tr.find('.name-file').text()
             $('#name_folder_rename').val(name);
             $('#rename_modal').modal('show')
         })
@@ -566,7 +566,7 @@
                 formData.append('id', rowId)
                 formData.append('_method', 'PATCH')
                 renameFile(formData)
-                tr.find('.show-children').text(name)
+                tr.find('.name-file').text(name)
             }
         })
 

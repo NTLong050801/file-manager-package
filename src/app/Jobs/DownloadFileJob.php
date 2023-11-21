@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Ntlong050801\FileManager\app\Models\FileManager;
+use Ntlong050801\FileManager\app\Models\User;
 use ZipArchive;
 
 class DownloadFileJob implements ShouldQueue
@@ -18,15 +19,19 @@ class DownloadFileJob implements ShouldQueue
 
     protected FileManager $fileManager;
 
-    protected bool $isTrash;
+    protected bool $isTrash, $isShare;
+
+    protected int $userId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(FileManager $fileManager, bool $isTrash = false)
+    public function __construct(FileManager $fileManager, int $userId, bool $isTrash = false, bool $isShare = false, )
     {
         $this->fileManager = $fileManager;
+        $this->userId = $userId;
         $this->isTrash = $isTrash;
+        $this->isShare = $isShare;
     }
 
     /**
@@ -37,7 +42,9 @@ class DownloadFileJob implements ShouldQueue
         try {
             $path = $this->fileManager->file_path;
             $zip = new ZipArchive();
-            $files = $this->fileManager->getPathFileIsTrash($this->fileManager,$this->isTrash);
+
+            $files = $this->fileManager->getPathFileIsTrash($this->fileManager,$this->userId, $this->isTrash, $this->isShare);
+
             $pathZip = storage_path('app/'.$this->fileManager->name.'.zip');
             if ($zip->open($pathZip, ZipArchive::CREATE) === true) {
                 foreach ($files as $file) {

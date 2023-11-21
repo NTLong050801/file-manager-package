@@ -54,7 +54,7 @@ class FileManager extends Model
     }
 
     public static function root(){
-        return FileManager::whereNull('parent_id')->where('parent_id',auth()->id())->first();
+        return FileManager::whereNull('parent_id')->first();
     }
 
     protected function fileSize(): Attribute
@@ -81,13 +81,19 @@ class FileManager extends Model
         return round($bytes, 2) . ' ' . $units[$pow];
     }
 
-    public function getPathFileIsTrash(FileManager $fileManager, bool $isTrash = false)
+    public function getPathFileIsTrash(FileManager $fileManager,int $userId, bool $isTrash = false, bool $isShare = false)
     {
         foreach ($fileManager->children as $child) {
-            if ($child->is_trash == $isTrash && !empty($child->file_type)) {
-                $this->arrayFilePath[] = $child->file_path;
+            if ($isShare) {
+                if (in_array($userId,$child->users->pluck('pivot.user_id')->toArray())){
+                    $this->arrayFilePath[] = $child->file_path;
+                }
+            }else{
+                if ($child->is_trash == $isTrash && !empty($child->file_type)) {
+                    $this->arrayFilePath[] = $child->file_path;
+                }
             }
-            $this->getPathFileIsTrash($child);
+            $this->getPathFileIsTrash($child, $userId, $isTrash, $isShare);
         }
         return $this->arrayFilePath;
     }

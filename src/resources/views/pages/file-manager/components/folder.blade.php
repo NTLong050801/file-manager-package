@@ -50,7 +50,8 @@
 
                     @endif
 
-                    <a href="#" class="text-gray-800 text-hover-primary ms-5 show-children" data-id="{{$children->id}}">{{$children->name}}</a>
+                    <a href="#" class="text-gray-800 text-hover-primary ms-5 show-children"
+                       data-type="{{$children->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$children->id}}">{{$children->name}}</a>
                 </div>
             </td>
             <!--end::Name=-->
@@ -118,7 +119,7 @@
             <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->
             <td>
-                @if(sizeof($children->getPathFileIsTrash($children, $isTrash)) > 0 || !empty($children->file_type))
+                @if(sizeof($children->getPathFileIsTrash($children,$userId, $isTrash, $isShare)) > 0 || !empty($children->file_type))
                     <button class="btn btn-sm btn-success download">Tải</button>
                 @endif
             </td>

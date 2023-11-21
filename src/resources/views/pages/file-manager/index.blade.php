@@ -502,6 +502,7 @@
         $(document).on('click', '.show-children', function (e) {
             e.preventDefault();
             parentId = $(this).data('id');
+            // navItemType = $(this).data('type');
             loadFolder(parentId)
         })
 
@@ -725,11 +726,9 @@
                 method: "GET",
                 data: {
                     'parent_id': parentId,
-                    'user_id': userId,
                     'type': navItemType,
                 },
                 success: function (response) {
-                    // console.log(response.count_children)
                     $('tbody').html(response.view)
                     $('#folder_path').html(response.folder_path)
                     $('#count_item').html(response.count_children.toString() + ' items')

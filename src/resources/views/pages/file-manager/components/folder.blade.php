@@ -3,8 +3,8 @@
         <tr class="even" data-id="{{$children->id}}">
             <!--begin::Checkbox-->
             <td>
-                <div class="form-check form-check-sm form-check-custom form-check-solid">
-                    <input class="form-check-input" type="checkbox" value="1">
+                <div class="form-check">
+                    <input class="form-check-input border-black checkbox-item" type="checkbox">
                 </div>
             </td>
             <!--end::Checkbox-->

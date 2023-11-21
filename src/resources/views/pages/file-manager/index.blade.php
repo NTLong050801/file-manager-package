@@ -31,7 +31,7 @@
             <!--begin::Card toolbar-->
             <div class="card-toolbar">
                 <!--begin::Toolbar-->
-                <div class="d-flex justify-content-end" data-kt-filemanager-table-toolbar="base">
+                <div class="d-flex justify-content-end" data-kt-filemanager-table-toolbar="base" id="toolbar_upload">
                     <!--begin::Export-->
                     <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#create_folder_modal">
                         <!--begin::Svg Icon | path: icons/duotune/files/fil013.svg-->
@@ -74,13 +74,16 @@
                 </div>
                 <!--end::Toolbar-->
                 <!--begin::Group actions-->
-                <div class="d-flex justify-content-end align-items-center d-none" data-kt-filemanager-table-toolbar="selected">
+                <div class="d-flex justify-content-end align-items-center d-none" id="selected_checkbox">
                     <div class="fw-bold me-5">
-                        <span class="me-2" data-kt-filemanager-table-select="selected_count"></span>Selected
+                        <span class="me-2" id="selected_count"></span>đã chọn
                     </div>
-                    <button type="button" class="btn btn-danger" data-kt-filemanager-table-select="delete_selected">Delete Selected</button>
+                    <button type="button" class="btn btn-danger" id="btn_delete_selected">Xoá đã chọn</button>
                 </div>
                 <!--end::Group actions-->
+                <div class="d-flex justify-content-end align-items-center ms-5 d-none" id="selected_checkbox_restore">
+                    <button type="button" class="btn btn-success" id="btn_restore">Khôi phục</button>
+                </div>
             </div>
             <!--end::Card toolbar-->
         </div>
@@ -114,8 +117,9 @@
                                     <!--begin::Table row-->
                                     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
                                         <th class="w-10px pe-2 sorting_disabled" rowspan="1" colspan="1">
-                                            <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                                <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_file_manager_list .form-check-input" value="1">
+                                            <div class="form-check me-3">
+                                                <input class="form-check-input border-black checkbox-all" type="checkbox" data-kt-check="true"
+                                                       data-kt-check-target="#kt_file_manager_list .form-check-input" value="1">
                                             </div>
                                         </th>
                                         <th>STT</th>
@@ -506,18 +510,30 @@
             loadFolder(parentId)
         })
 
-        $('#type_folder').on('change',function () {
-            // $('.nav-link').removeClass('active')
-            // $(this).addClass('active')
+        $('#type_folder').on('change', function () {
+
             navItemType = $(this).val()
-            if (navItemType === "deleted-folder" || navItemType === "share-folder"){
+            if (navItemType === "deleted-folder" || navItemType === "share-folder") {
                 parentId = null;
-                $('.card-toolbar').hide()
-            }else{
-                $('.card-toolbar').show()
+                $('#toolbar_upload').addClass('d-none')
+            } else {
+                $('#toolbar_upload').removeClass('d-none')
                 parentId = {{$parent->id}};
             }
             loadFolder();
+        })
+
+        $('.checkbox-all').on('change', function () {
+            const isChecked = $(this).prop("checked");
+            $(".checkbox-item").prop("checked", isChecked);
+            showDeleteButton()
+            showRestoreButton()
+        })
+        $(document).on('change', '.checkbox-item', function () {
+            const allChecked = $(".checkbox-item:checked").length === $('.checkbox-item').length/2;
+            $(".checkbox-all").prop("checked", allChecked);
+            showDeleteButton()
+            showRestoreButton()
         })
 
 //         $(document).on('click', function (event) {
@@ -539,7 +555,7 @@
             tr = $(this).closest('tr');
             rowId = tr.data('id');
 
-            if ($(this).hasClass('menu-toggle')){
+            if ($(this).hasClass('menu-toggle')) {
                 const closest = $(this).closest('.more');
                 const targetMenu = closest.find('.menu');
 
@@ -591,13 +607,13 @@
                 showToast('Vui lòng chọn ít nhất một tệp', null, 'error')
             }
         });
-        $(document).on('click','.download',function () {
+        $(document).on('click', '.download', function () {
             const id = $(this).closest('tr').data('id');
-            let downloadUrl = "/ajax/download-file?id="+id+"&type="+navItemType;
+            let downloadUrl = "/ajax/download-file?id=" + id + "&type=" + navItemType;
             window.open(downloadUrl, '_blank');
         })
 
-        $(document).on('click','.delete',function(){
+        $(document).on('click', '.delete', function () {
             Swal.fire({
                 text: `Bạn có chắc muốn xoá thư mục/bản ghi này?`,
                 icon: "warning",
@@ -612,16 +628,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     let formData = new FormData();
-                    formData.append('id',rowId);
-                    formData.append('value',1);
-                    formData.append('is_direct_deleted',1);
-                    formData.append('_method','PATCH');
+                    formData.append('ids[]', rowId);
+                    formData.append('value', 1);
+                    formData.append('is_direct_deleted', 1);
+                    formData.append('_method', 'PATCH');
                     putTrashFolder(formData)
                 }
             });
         })
 
-        $(document).on('click','.restore',function () {
+        $(document).on('click', '.restore', function () {
             Swal.fire({
                 text: `Bạn có chắc muốn khôi phục?`,
                 icon: "warning",
@@ -636,16 +652,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     let formData = new FormData();
-                    formData.append('id',rowId);
-                    formData.append('value',0);
-                    formData.append('is_direct_deleted',0);
-                    formData.append('_method','PATCH');
+                    formData.append('ids[]', rowId);
+                    formData.append('value', 0);
+                    formData.append('is_direct_deleted', 0);
+                    formData.append('_method', 'PATCH');
                     putTrashFolder(formData)
                 }
             });
         })
 
-        $(document).on('click','.destroy',function () {
+        $(document).on('click', '.destroy', function () {
             Swal.fire({
                 text: `Bạn có chắc muốn xoá vĩnh viễn?`,
                 icon: "warning",
@@ -660,16 +676,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     let formData = new FormData();
-                    formData.append('id',rowId);
-                    formData.append('_method','DELETE');
+                    formData.append('ids[]', rowId);
+                    formData.append('_method', 'DELETE');
                     destroyFolder(formData)
                 }
             });
         })
 
-        $(document).on('keyup','.input_keyword',function(){
+        $(document).on('keyup', '.input_keyword', function () {
             const searchText = $(this).val().toLowerCase();
-            $(this).closest('.modal').find(".block-user").each(function() {
+            $(this).closest('.modal').find(".block-user").each(function () {
                 const username = $(this).find(".name-user").text().toLowerCase();
                 if (username.includes(searchText)) {
                     $(this).show();
@@ -679,7 +695,7 @@
             });
         })
 
-        $(document).on('change','.receiver-checkbox',function () {
+        $(document).on('change', '.receiver-checkbox', function () {
             let userId = $(this).data('id');
             let is_active = $(this).prop("checked");
             if (is_active === true) {
@@ -702,6 +718,71 @@
                 }
             });
         })
+
+        $('#btn_delete_selected').on('click', function () {
+            let listIds = [];
+            let text = 'Bạn có chắc muốn xoá các file đã chọn?';
+            $('.checkbox-item').each(function () {
+                if ($(this).prop("checked")){
+                    listIds.push($(this).closest('tr').data('id'))
+                }
+            })
+            if (navItemType === 'deleted-folder'){
+                text = "Bạn có chắc chắn muốn xoá vĩnh viễn không?"
+            }
+            if (listIds.length > 0){
+                Swal.fire({
+                    text: text,
+                    icon: "warning",
+                    buttonsStyling: false,
+                    showCancelButton: true,
+                    confirmButtonText: "Có",
+                    cancelButtonText: "Huỷ",
+                    customClass: {
+                        confirmButton: "btn btn-primary",
+                        cancelButton: "btn btn-danger"
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let formData = new FormData();
+                        formData.append('ids[]', listIds);
+                        if (navItemType === 'deleted-folder'){
+                            formData.append('_method', 'DELETE');
+                            destroyFolder(formData)
+                        }else{
+                            formData.append('value', 1);
+                            formData.append('is_direct_deleted', 1);
+                            formData.append('_method', 'PATCH');
+                            putTrashFolder(formData)
+                        }
+
+                    }
+                });
+            }
+        })
+
+        const showDeleteButton = () => {
+            let countItemCheckbox = $(".checkbox-item:checked").length;
+            if (countItemCheckbox > 0) {
+                $('#selected_checkbox').removeClass('d-none');
+                $('#toolbar_upload').addClass('d-none');
+                $('#selected_count').text(countItemCheckbox);
+            } else {
+                $('#selected_checkbox').addClass('d-none');
+                if (navItemType !== "deleted-folder" && navItemType !== "share-folder") {
+                    $('#toolbar_upload').removeClass('d-none');
+                }
+                $('.checkbox-all').prop('checked', false);
+            }
+        }
+        const showRestoreButton = () => {
+            let selectedValue = $('#type_folder').val();
+            if (selectedValue === "deleted-folder" && $(".checkbox-item:checked").length > 0) {
+                $('#selected_checkbox_restore').removeClass('d-none');
+            } else {
+                $('#selected_checkbox_restore').addClass('d-none');
+            }
+        };
         const renameFile = (formData) => {
             $.ajax({
                 url: "{{route('ajax.rename')}}",
@@ -733,6 +814,7 @@
                     $('#folder_path').html(response.folder_path)
                     $('#count_item').html(response.count_children.toString() + ' items')
                     $('[data-bs-toggle="tooltip"]').tooltip();
+                    showDeleteButton();
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

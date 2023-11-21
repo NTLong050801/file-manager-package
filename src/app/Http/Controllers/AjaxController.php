@@ -5,6 +5,7 @@ namespace Ntlong050801\FileManager\app\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Ntlong050801\FileManager\app\Jobs\DownloadFileJob;
 use Ntlong050801\FileManager\app\Models\FileManager;
@@ -76,7 +77,7 @@ class AjaxController extends Controller
                         if (empty($parentId)) {
                             $parentId = FileManager::root()->id;
                         }
-                        $query->where('user_id', $userId)->where('parent_id', $parentId);
+                        $query->where('user_id', $userId)->where('parent_id', $parentId)->where('is_trash', false);
                         // Các file được chia sẻ với bạn
                         $query->orWhereHas('users', function ($query) use ($userId) {
                             $query->where('user_id', $userId)->where('is_click_permission', true)->where('is_trash', false);
@@ -217,6 +218,7 @@ class AjaxController extends Controller
                     Storage::delete($pathZip);
                 }
                 DownloadFileJob::dispatch($file, $userId, $isTrash, $isShare)->delay(now()->addSeconds(30));
+
                 return response()->download($pathZip)->deleteFileAfterSend();
             } else {
                 if ($isShare) {
@@ -235,28 +237,35 @@ class AjaxController extends Controller
     public function trash(Request $request)
     {
         $request->validate([
-            'id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+            'ids' => ['array', 'required'],
             'value' => ['required', Rule::in(['0', '1'])],
             'is_direct_deleted' => ['required', Rule::in(['0', '1'])]
         ]);
         try {
-            $file = FileManager::findOrFail($request->input('id'));
-            $root = FileManager::root();
-            if ($file->parent->is_direct_deleted) {
-                $originalFilePath = $file->file_path;
-                $destinationDirectory = $root->file_path;
-                $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
-                $destinationPath = $destinationDirectory.'/'.$filename;
-                Storage::move($originalFilePath, $destinationPath);
+            $idString = $request->input('ids')[0];
+            $idArray = explode(',', $idString);
+            foreach ($idArray as $id) {
+                Validator::make(['id' => $id], [
+                    'id.*' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+                ])->validate();
+                $file = FileManager::findOrFail($id);
+                $root = FileManager::root();
+                if ($file->parent->is_direct_deleted) {
+                    $originalFilePath = $file->file_path;
+                    $destinationDirectory = $root->file_path;
+                    $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
+                    $destinationPath = $destinationDirectory.'/'.$filename;
+                    Storage::move($originalFilePath, $destinationPath);
+                    $file->update([
+                        'parent_id' => $root->id,
+                        'file_path' => $root->file_path.'/'.$file->name,
+                    ]);
+                }
                 $file->update([
-                    'parent_id' => $root->id,
-                    'file_path' => $root->file_path.'/'.$file->name,
+                    'is_direct_deleted' => $request->input('is_direct_deleted'),
                 ]);
+                $this->updateIsTrash($file, $request->input('value'));
             }
-            $file->update([
-                'is_direct_deleted' => $request->input('is_direct_deleted'),
-            ]);
-            $this->updateIsTrash($file, $request->input('value'));
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
@@ -265,18 +274,25 @@ class AjaxController extends Controller
     public function destroy(Request $request)
     {
         $request->validate([
-            'id' => ['required',  Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+            'ids' => ['array', 'required'],
         ]);
         try {
-            $file = FileManager::find($request->input('id'));
-            $filePath = $file->file_path;
-            $this->destroyFileIsDirectDeleted($file);
-            if (!empty($file->file_type)) {
-                Storage::delete($filePath);
-            } else {
-                Storage::deleteDirectory($filePath);
+            $idString = $request->input('ids')[0];
+            $idArray = explode(',', $idString);
+            foreach ($idArray as $id) {
+                Validator::make(['id' => $id], [
+                    'id.*' => ['required', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+                ])->validate();
+                $file = FileManager::find($id);
+                $filePath = $file->file_path;
+                $this->destroyFileIsDirectDeleted($file);
+                if (!empty($file->file_type)) {
+                    Storage::delete($filePath);
+                } else {
+                    Storage::deleteDirectory($filePath);
+                }
+                $file->delete();
             }
-            $file->delete();
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
@@ -286,7 +302,7 @@ class AjaxController extends Controller
     {
         $request->validate([
             'user_id' => ['required', 'integer'],
-            'file_id' => ['required', 'integer',  Rule::in(User::find(auth()->id())->file->where('is_trash',false)->pluck('id')->toArray())],
+            'file_id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->where('is_trash', false)->pluck('id')->toArray())],
             'is_active' => ['required', 'boolean'],
         ]);
         try {

@@ -15,6 +15,7 @@ Route::middleware('web')->group(function (){
         Route::patch('/rename',[AjaxController::class,'rename'])->name('ajax.rename');
         Route::post('/upload-file',[AjaxController::class,'uploadFile'])->name('ajax.upload-file');
         Route::get('/download-file',[AjaxController::class,'downloadFile'])->name('ajax.download-file');
+        Route::get('/download-multiple-files',[AjaxController::class,'downloadMultipleFile'])->name('ajax.download-multiple-file');
 
         Route::patch('/put-file-trash',[AjaxController::class,'trash'])->name('ajax.put-file-trash');
         Route::delete('/destroy',[AjaxController::class,'destroy'])->name('ajax.destroy');

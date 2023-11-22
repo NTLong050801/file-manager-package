@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Ntlong050801\FileManager\app\Jobs\DownloadFileJob;
+use Ntlong050801\FileManager\app\Jobs\DownloadMultipleFileJob;
 use Ntlong050801\FileManager\app\Models\FileManager;
 use Ntlong050801\FileManager\app\Models\User;
 
@@ -150,6 +151,7 @@ class AjaxController extends Controller
             if (!empty($file->file_type)) {
                 $newFilePath = $newFilePath.".$file->file_type";
             }
+
             Storage::move($currentFilePath, $newFilePath);
 
             $file->update([
@@ -166,12 +168,12 @@ class AjaxController extends Controller
     public function uploadFile(Request $request)
     {
         $request->validate([
-            'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
+            'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:5120',
         ]);
         try {
-            if (empty($request->input('parent_id'))){
+            if (empty($request->input('parent_id'))) {
                 $parentId = FileManager::root()->id;
-            }else{
+            } else {
                 $parentId = $request->input('parent_id');
             }
             $path = FileManager::findOrFail($parentId)->file_path;
@@ -204,8 +206,10 @@ class AjaxController extends Controller
 
     public function downloadFile(Request $request)
     {
+        $privateFileId = User::find(auth()->id())->file->pluck('id')->toArray();
+        $user = User::find(auth()->id())->files->pluck('id')->toArray();
         $request->validate([
-            'id' => ['required', 'integer'],
+            'id' => ['required', 'integer', Rule::in(array_merge($privateFileId, $user))],
             'type' => ['required', Rule::in(FileManager::LIST_TYPE_FOLDER)],
         ]);
         $file = FileManager::findOrFail($request->input('id'));
@@ -237,6 +241,30 @@ class AjaxController extends Controller
         }
     }
 
+    public function downloadMultipleFile(Request $request)
+    {
+        $request->validate([
+            'ids' => ['required'],
+        ]);
+        $ids = explode('-', $request->input('ids'));
+        try {
+            Validator::make(['ids' => $ids], [
+                'ids' => ['required', 'array'],
+                'ids.*' => ['integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+            ]);
+            $fileParent = FileManager::find($ids[0])->parent;
+            $pathZip = storage_path('app/'.$fileParent->name.'.zip');
+            if (Storage::exists($pathZip)) {
+                Storage::delete($pathZip);
+            }
+            DownloadMultipleFileJob::dispatch($ids, auth()->id(), $pathZip);
+            return response()->download($pathZip)->deleteFileAfterSend();
+
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
     public function trash(Request $request)
     {
         $request->validate([
@@ -248,9 +276,13 @@ class AjaxController extends Controller
             $idString = $request->input('ids')[0];
             $idArray = explode(',', $idString);
             foreach ($idArray as $id) {
-                Validator::make(['id' => $id], [
-                    'id.*' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
-                ])->validate();
+
+                $validator = Validator::make(['id' => $id], [
+                    'id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+                ]);
+                if ($validator->fails()) {
+                    return response()->json(['message' => $validator->errors()->first()], 422);
+                }
                 $file = FileManager::findOrFail($id);
                 $root = FileManager::root();
                 if ($file->parent->is_direct_deleted) {
@@ -261,7 +293,7 @@ class AjaxController extends Controller
                     Storage::move($originalFilePath, $destinationPath);
                     $file->update([
                         'parent_id' => $root->id,
-                        'file_path' => $root->file_path.'/'.$file->name,
+                        'file_path' => $destinationPath,
                     ]);
                 }
                 $file->update([

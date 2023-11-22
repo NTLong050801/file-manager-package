@@ -13,25 +13,24 @@ use Ntlong050801\FileManager\app\Models\FileManager;
 use Ntlong050801\FileManager\app\Models\User;
 use ZipArchive;
 
-class DownloadFileJob implements ShouldQueue
+class DownloadMultipleFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected FileManager $fileManager;
-
-    protected bool $isTrash, $isShare;
+    protected array $ids;
 
     protected int $userId;
+
+    protected string $pathZip;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(FileManager $fileManager, int $userId, bool $isTrash = false, bool $isShare = false, )
+    public function __construct(array $ids, int $userId, string $pathZip)
     {
-        $this->fileManager = $fileManager;
+        $this->ids = $ids;
         $this->userId = $userId;
-        $this->isTrash = $isTrash;
-        $this->isShare = $isShare;
+        $this->pathZip = $pathZip;
     }
 
     /**
@@ -40,15 +39,27 @@ class DownloadFileJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            $path = $this->fileManager->file_path;
             $zip = new ZipArchive();
+            $pathZip = $this->pathZip;
+            $files =  [];
+            $filePathParent = null;
+            foreach ($this->ids as $id){
+                $fileManager = FileManager::find($id);
+                if (empty($filePathParent)){
+                    $filePathParent = $fileManager->parent->file_path;
+                }
+                $path = $fileManager->file_path;
+                if (!empty($fileManager->file_type)){
+                    $files[] = [$path];
+                }else{
+                   $files[] = $fileManager->getPathFileIsTrash($fileManager,$this->userId);
+                }
+            }
+            $files = array_merge(...array_filter($files));
 
-            $files = $this->fileManager->getPathFileIsTrash($this->fileManager,$this->userId, $this->isTrash, $this->isShare);
-
-            $pathZip = storage_path('app/'.$this->fileManager->name.'.zip');
             if ($zip->open($pathZip, ZipArchive::CREATE) === true) {
                 foreach ($files as $file) {
-                    $zip->addFile(storage_path('app/'.$file), str_replace($path.'/', '', $file));
+                    $zip->addFile(storage_path('app/'.$file), str_replace($filePathParent.'/', '', $file));
                 }
             }
         } catch (\Exception $exception) {

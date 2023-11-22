@@ -3,9 +3,11 @@
         <tr class="even" data-id="{{$child->id}}">
             <!--begin::Checkbox-->
             <td>
-                <div class="form-check">
-                    <input class="form-check-input border-black checkbox-item" type="checkbox">
-                </div>
+                @if($child->user_id == $userId)
+                    <div class="form-check">
+                        <input class="form-check-input border-black checkbox-item-file" type="checkbox">
+                    </div>
+                @endif
             </td>
             <!--end::Checkbox-->
             <td>{{$loop->iteration}}</td>
@@ -50,7 +52,7 @@
 
                     @endif
 
-                    <a href="#" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($child->file_type)) show-children @endif"
+                    <a href="javascript:void(0)" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($child->file_type)) show-children @endif"
                        data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">{{$child->name}}</a>
                 </div>
             </td>
@@ -77,14 +79,14 @@
                             </div>
                         @endforeach
                         <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle ms-1 add-permission w-30px h-30px" data-bs-toggle="modal"
-                           data-bs-target="#permission_modal_{{$child->id}}">
-                            <svg class="svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
-                                 viewBox="0 0 448 512" data-fa-i2svg=""
-                                 style="display: inline-block;    font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
-                            >
-                                <path fill="currentColor"
-                                      d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
-                            </svg>
+                           data-bs-target="#permission_modal_{{$child->id}}" data-bs-placement="top" title="Thêm quyền">
+                            <svg class=" svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 448 512" data-fa-i2svg=""
+                        style="display: inline-block; font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
+                        >
+                        <path fill="currentColor"
+                              d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
+                        </svg>
                         </a>
                     </div>
                     <div class="modal fade" id="permission_modal_{{$child->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -139,30 +141,30 @@
             <!--end::Last modified-->
             <td>
                 @if(sizeof($child->getPathFileIsTrash($child,$userId, $isTrash, $isShare)) > 0 || !empty($child->file_type))
-{{--                    <button class="btn btn-sm btn-success download"><i class="fa-regular fa-circle-down fa-2xl"></i></button>--}}
-                    <i class="fa-regular fa-circle-down text-success fs-2x download"></i>
+                    {{--                    <button class="btn btn-sm btn-success download"><i class="fa-regular fa-circle-down fa-2xl"></i></button>--}}
+                    <i class="fa-regular fa-circle-down text-success fs-2x download" data-bs-toggle="tooltip" data-bs-placement="top" title="Tải xuống"></i>
                 @endif
             </td>
             <!--begin::Actions-->
-            <td class="text-end" data-kt-filemanager-table="action_dropdown">
+            <td class="text-end" data-kt-filemanager-table="action_dropdown" style="position: relative">
                 @if($child->user_id == $userId)
                     <div class="d-flex justify-content-end">
                         <!--begin::More-->
-                        <div class="ms-2 more" data-id="{{$child->id}}">
+                        <div class="ms-2 more" data-id="{{$child->id}}" style="position: relative">
                             <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click"
                                     data-kt-menu-placement="bottom-end">
                                 <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
                                 <span class="svg-icon svg-icon-5 m-0">
-                            <img src="{{asset('assets/media/icons/duotune/general/gen052.svg')}}" alt="">
-                        </span>
+                                    <img src="{{asset('assets/media/icons/duotune/general/gen052.svg')}}" alt="">
+                                </span>
                                 <!--end::Svg Icon-->
                             </button>
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
-                                 data-kt-menu="true" style=" position: fixed;z-index: 100;right:100px">
+                                 data-kt-menu="true">
                                 @if(!$child->is_direct_deleted)
                                     <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
+                                    <div class="menu-item px-3 pt-0 pb-0">
                                         <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
                                     </div>
                                     <!--end::Menu item-->
@@ -173,19 +175,19 @@
                                     {{--                                    </div>--}}
                                     {{--                                    <!--end::Menu item-->--}}
                                     <!--begin::Menu item-->
-                                    <div class="menu-item px-3 =">
+                                    <div class="menu-item px-3 pt-0 pb-0">
                                         <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
                                     </div>
                                     <!--end::Menu item-->
                                 @else
                                     <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3 restore">Khôi phục</a>
+                                    <div class="menu-item px-3 pt-0 pb-0">
+                                        <a href="#" class="menu-link px-3 pt-0 pb-0 restore">Khôi phục</a>
                                     </div>
                                     <!--end::Menu item-->
                                     <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3 text-danger destroy">Xoá vĩnh viễn</a>
+                                    <div class="menu-item px-3 pt-0 pb-0">
+                                        <a href="#" class="menu-link px-3 pt-0 pb-0 text-danger destroy">Xoá vĩnh viễn</a>
                                     </div>
                                     <!--end::Menu item-->
                                 @endif

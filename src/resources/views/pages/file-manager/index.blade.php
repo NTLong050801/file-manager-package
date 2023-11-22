@@ -33,7 +33,7 @@
                 <!--begin::Toolbar-->
                 <div class="d-flex justify-content-end" data-kt-filemanager-table-toolbar="base" id="toolbar_upload">
                     <!--begin::Export-->
-                    <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#create_folder_modal">
+                    <button type="button" class="btn btn-sm btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#create_folder_modal">
                         <!--begin::Svg Icon | path: icons/duotune/files/fil013.svg-->
                         <span class="svg-icon svg-icon-2">
 								<img src="{{asset('assets/media/icons/duotune/files/fil013.svg')}}" alt="">
@@ -63,7 +63,7 @@
                     </div>
                     <!--end::Export-->
                     <!--begin::Add customer-->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_upload">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_upload">
                         <!--begin::Svg Icon | path: icons/duotune/files/fil018.svg-->
                         <span class="svg-icon svg-icon-2">
                                 <img src="{{asset('assets/media/icons/duotune/files/fil018.svg')}}" alt="">
@@ -78,11 +78,12 @@
                     <div class="fw-bold me-5">
                         <span class="me-2" id="selected_count"></span>đã chọn
                     </div>
-                    <button type="button" class="btn btn-danger" id="btn_delete_selected">Xoá đã chọn</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="btn_delete_selected">Xoá đã chọn</button>
+                    <button type="button" class="btn btn-sm btn-primary ms-3" id="btn_export_selected">Xuất đã chọn</button>
                 </div>
                 <!--end::Group actions-->
                 <div class="d-flex justify-content-end align-items-center ms-5 d-none" id="selected_checkbox_restore">
-                    <button type="button" class="btn btn-success" id="btn_restore_selected">Khôi phục</button>
+                    <button type="button" class="btn btn-sm btn-success" id="btn_restore_selected">Khôi phục</button>
                 </div>
             </div>
             <!--end::Card toolbar-->
@@ -109,10 +110,10 @@
             <!--begin::Table-->
             <div id="kt_file_manager_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                 <div class="table-responsive">
-                    <div class="dataTables_scroll">
+                    <div class="">
                         <div class="dataTables_scrollHead">
                             <div class="dataTables_scrollHeadInner">
-                                <table data-kt-filemanager-table="folders" class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+                                <table data-kt-filemanager-table="folders" class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table_data">
                                     <thead>
                                     <!--begin::Table row-->
                                     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
@@ -526,18 +527,18 @@
 
         $('.checkbox-all').on('change', function () {
             const isChecked = $(this).prop("checked");
-            $(".checkbox-item").prop("checked", isChecked);
+            $("#table_data .checkbox-item-file").prop("checked", isChecked);
             showDeleteButton()
             showRestoreButton()
         })
-        $(document).on('change', '.checkbox-item', function () {
-            const allChecked = $(".checkbox-item:checked").length === $('.checkbox-item').length/2;
+        $(document).on('change', '.checkbox-item-file', function () {
+            const allChecked = $("#table_data .checkbox-item-file:checked").length === $('#table_data .checkbox-item-file').length;
             $(".checkbox-all").prop("checked", allChecked);
             showDeleteButton()
             showRestoreButton()
         })
 
-        $(document).on('click', '.menu-toggle, .add-permission', function () {
+        $(document).on('click', '.menu-toggle, .add-permission', function (event) {
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
             tr = $(this).closest('tr');
             rowId = tr.data('id');
@@ -549,10 +550,22 @@
                 $('.menu-sub-dropdown').not(targetMenu).removeClass('show');
                 if (targetMenu.hasClass('menu-sub-dropdown')) {
                     targetMenu.toggleClass('show');
+                    targetMenu.css({
+                        position: 'absolute',
+                        top: $(this).outerHeight() + 'px',
+                        right:'50px',
+                    })
                 }
             }
+            event.stopPropagation();
         });
-
+        $(document).on('click', function(event) {
+            // Check if the clicked element is not a descendant of the menu or the menu toggle
+            if (!$(event.target).closest('.menu').length && !$(event.target).hasClass('menu-toggle')) {
+                // Hide all menu-sub-dropdown elements
+                $('.menu-sub-dropdown').removeClass('show');
+            }
+        });
         $(document).on('click', '.rename', function () {
             const name = tr.find('.name-file').text()
             $('#name_folder_rename').val(name);
@@ -580,8 +593,8 @@
                 // Loop through each selected file
                 for (let i = 0; i < input.files.length; i++) {
                     const file = input.files[i];
-                    if (file.size > 1024 * 1024) {
-                        showToast('Kích thước tệp vượt quá giới hạn (1MB). Vui lòng chọn tệp nhỏ hơn', null, 'error')
+                    if (file.size > 5 * 1024) {
+                        showToast('Kích thước tệp vượt quá giới hạn (5MB). Vui lòng chọn tệp nhỏ hơn', null, 'error')
                         return;
                     }
                 }
@@ -707,17 +720,12 @@
         })
 
         $('#btn_delete_selected').on('click', function () {
-            let listIds = [];
+            const listIds = getListIdsChecked()
             let text = 'Bạn có chắc muốn xoá các file đã chọn?';
-            $('.checkbox-item').each(function () {
-                if ($(this).prop("checked")){
-                    listIds.push($(this).closest('tr').data('id'))
-                }
-            })
-            if (navItemType === 'deleted-folder'){
+            if (navItemType === 'deleted-folder') {
                 text = "Bạn có chắc chắn muốn xoá vĩnh viễn không?"
             }
-            if (listIds.length > 0){
+            if (listIds.length > 0) {
                 Swal.fire({
                     text: text,
                     icon: "warning",
@@ -733,10 +741,10 @@
                     if (result.isConfirmed) {
                         let formData = new FormData();
                         formData.append('ids[]', listIds);
-                        if (navItemType === 'deleted-folder'){
+                        if (navItemType === 'deleted-folder') {
                             formData.append('_method', 'DELETE');
                             destroyFolder(formData)
-                        }else{
+                        } else {
                             formData.append('value', 1);
                             formData.append('is_direct_deleted', 1);
                             formData.append('_method', 'PATCH');
@@ -747,14 +755,9 @@
                 });
             }
         })
-        $('#btn_restore_selected').on('click',function () {
-            let listIds = [];
-            $('.checkbox-item').each(function () {
-                if ($(this).prop("checked")){
-                    listIds.push($(this).closest('tr').data('id'))
-                }
-            })
-            if (listIds.length > 0){
+        $('#btn_restore_selected').on('click', function () {
+            const listIds = getListIdsChecked();
+            if (listIds.length > 0) {
                 Swal.fire({
                     text: `Bạn có muốn khôi phục các file đã chọn?`,
                     icon: "warning",
@@ -779,8 +782,14 @@
                 });
             }
         })
+        $('#btn_export_selected').on('click', function () {
+            const listIds = getListIdsChecked().join('-');
+            let downloadUrl = "/ajax/download-multiple-files?ids=" + listIds;
+            window.open(downloadUrl, '_blank');
+        })
         const showDeleteButton = () => {
-            let countItemCheckbox = $(".checkbox-item:checked").length;
+            let countItemCheckbox = $("#table_data .checkbox-item-file:checked").length;
+
             if (countItemCheckbox > 0) {
                 $('#selected_checkbox').removeClass('d-none');
                 $('#toolbar_upload').addClass('d-none');
@@ -789,13 +798,20 @@
                 $('#selected_checkbox').addClass('d-none');
                 if (navItemType !== "deleted-folder" && navItemType !== "share-folder") {
                     $('#toolbar_upload').removeClass('d-none');
+
                 }
+                if (navItemType === "deleted-folder" || navItemType === "share-folder") {
+                    $('#btn_export_selected').addClass('d-none')
+                } else {
+                    $('#btn_export_selected').removeClass('d-none')
+                }
+                // $('#btn_export_selected').removeClass('d-none')
                 $('.checkbox-all').prop('checked', false);
             }
         }
         const showRestoreButton = () => {
             let selectedValue = $('#type_folder').val();
-            if (selectedValue === "deleted-folder" && $(".checkbox-item:checked").length > 0) {
+            if (selectedValue === "deleted-folder" && $("#table_data .checkbox-item-file:checked").length > 0) {
                 $('#selected_checkbox_restore').removeClass('d-none');
             } else {
                 $('#selected_checkbox_restore').addClass('d-none');
@@ -867,6 +883,7 @@
                 success: function () {
                     loadFolder()
                     showToast("Tải file thành công", null, 'success')
+                    $('#formFileMultiple').val(null)
                     $('#kt_modal_upload').modal('hide')
                 },
                 error: function (xhr, status, error) {
@@ -906,7 +923,15 @@
                 }
             });
         }
-
+        const getListIdsChecked = () => {
+            let listIds = [];
+            $('.checkbox-item-file').each(function () {
+                if ($(this).prop("checked")) {
+                    listIds.push($(this).closest('tr').data('id'));
+                }
+            })
+            return listIds;
+        }
         loadFolder()
     })
 </script>

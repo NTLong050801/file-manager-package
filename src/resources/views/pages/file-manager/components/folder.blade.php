@@ -67,7 +67,26 @@
             <!--end::Size-->
             <td>
                 @if($children->user_id == $userId && !$children->is_trash)
-                    <button class="btn btn-sm btn-primary add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}">Thêm</button>
+                    {{--                    <button class="btn btn-sm btn-primary rounded-5 add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}"><i class="fa-solid fa-user-plus"></i></button>--}}
+                    <div class="d-flex">
+                        @foreach($children->users->take(3) as $userFile)
+                            <div>
+                                <img src="{{$userFile->avatar}}" width="30" height="30" class="rounded-circle" alt=""
+                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{$userFile->name}}"
+                                >
+                            </div>
+                        @endforeach
+                        <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle add-permission w-30px h-30px" data-bs-toggle="modal"
+                           data-bs-target="#permission_modal_{{$children->id}}">
+                            <svg class="svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 448 512" data-fa-i2svg=""
+                                 style="display: inline-block;    font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
+                            >
+                                <path fill="currentColor"
+                                      d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
+                            </svg>
+                        </a>
+                    </div>
                     <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-scrollable">
                             <div class="modal-content">
@@ -120,7 +139,8 @@
             <!--end::Last modified-->
             <td>
                 @if(sizeof($children->getPathFileIsTrash($children,$userId, $isTrash, $isShare)) > 0 || !empty($children->file_type))
-                    <button class="btn btn-sm btn-success download">Tải</button>
+{{--                    <button class="btn btn-sm btn-success download"><i class="fa-regular fa-circle-down fa-2xl"></i></button>--}}
+                    <i class="fa-regular fa-circle-down text-success fs-2x download"></i>
                 @endif
             </td>
             <!--begin::Actions-->
@@ -139,19 +159,19 @@
                             </button>
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
-                                 data-kt-menu="true" style=" position: absolute;z-index: 100;right:50px">
+                                 data-kt-menu="true" style=" position: fixed;z-index: 100;right:100px">
                                 @if(!$children->is_direct_deleted)
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3">
                                         <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
                                     </div>
                                     <!--end::Menu item-->
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
-                                           data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
-                                    </div>
-                                    <!--end::Menu item-->
+                                    {{--                                    <!--begin::Menu item-->--}}
+                                    {{--                                    <div class="menu-item px-3">--}}
+                                    {{--                                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"--}}
+                                    {{--                                           data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>--}}
+                                    {{--                                    </div>--}}
+                                    {{--                                    <!--end::Menu item-->--}}
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 =">
                                         <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>

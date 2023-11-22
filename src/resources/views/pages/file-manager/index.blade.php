@@ -82,7 +82,7 @@
                 </div>
                 <!--end::Group actions-->
                 <div class="d-flex justify-content-end align-items-center ms-5 d-none" id="selected_checkbox_restore">
-                    <button type="button" class="btn btn-success" id="btn_restore">Khôi phục</button>
+                    <button type="button" class="btn btn-success" id="btn_restore_selected">Khôi phục</button>
                 </div>
             </div>
             <!--end::Card toolbar-->
@@ -518,6 +518,7 @@
                 $('#toolbar_upload').addClass('d-none')
             } else {
                 $('#toolbar_upload').removeClass('d-none')
+                $('#selected_checkbox_restore').addClass('d-none')
                 parentId = {{$parent->id}};
             }
             loadFolder();
@@ -760,7 +761,38 @@
                 });
             }
         })
+        $('#btn_restore_selected').on('click',function () {
+            let listIds = [];
+            $('.checkbox-item').each(function () {
+                if ($(this).prop("checked")){
+                    listIds.push($(this).closest('tr').data('id'))
+                }
+            })
+            if (listIds.length > 0){
+                Swal.fire({
+                    text: `Bạn có muốn khôi phục các file đã chọn?`,
+                    icon: "warning",
+                    buttonsStyling: false,
+                    showCancelButton: true,
+                    confirmButtonText: "Có",
+                    cancelButtonText: "Huỷ",
+                    customClass: {
+                        confirmButton: "btn btn-primary",
+                        cancelButton: "btn btn-danger"
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let formData = new FormData();
+                        formData.append('ids[]', listIds);
+                        formData.append('value', 0);
+                        formData.append('is_direct_deleted', 0);
+                        formData.append('_method', 'PATCH');
+                        putTrashFolder(formData)
 
+                    }
+                });
+            }
+        })
         const showDeleteButton = () => {
             let countItemCheckbox = $(".checkbox-item:checked").length;
             if (countItemCheckbox > 0) {

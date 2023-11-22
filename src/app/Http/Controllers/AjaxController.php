@@ -109,7 +109,7 @@ class AjaxController extends Controller
         try {
             $name = $request->input('name');
             if (empty($request->input('parent_id'))) {
-                $parent = FileManager::where('user_id', $request->input('user_id'))->whereNull('parent_id')->first();
+                $parent = FileManager::root();
             } else {
                 $parent = FileManager::find($request->input('parent_id'));
             }
@@ -122,7 +122,7 @@ class AjaxController extends Controller
             FileManager::create([
                 'name' => $name,
                 'file_path' => $path,
-                'parent_id' => $request->input('parent_id'),
+                'parent_id' => $parent->id,
                 'user_id' => auth()->id(),
             ]);
         } catch (\Exception $exception) {
@@ -167,10 +167,13 @@ class AjaxController extends Controller
     {
         $request->validate([
             'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:1024',
-            'parent_id' => ['required', 'integer'],
         ]);
         try {
-            $parentId = $request->input('parent_id');
+            if (empty($request->input('parent_id'))){
+                $parentId = FileManager::root()->id;
+            }else{
+                $parentId = $request->input('parent_id');
+            }
             $path = FileManager::findOrFail($parentId)->file_path;
             foreach ($request->file('files') as $file) {
                 // Get the file size in bytes

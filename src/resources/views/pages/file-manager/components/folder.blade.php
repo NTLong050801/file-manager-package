@@ -52,7 +52,13 @@
 
                     @endif
 
-                    <a href="javascript:void(0)" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($child->file_type)) show-children @endif"
+                    <a href="javascript:void(0)"
+                       class="text-gray-800 text-hover-primary ms-5 name-file @switch($child->file_type) @case('pdf')  preview-pdf  @break
+                        @case('jpeg')
+                        @case('png')
+                        @case('jpg')
+                        @case('gif') preview-image @break @default show-children @endswitch"
+                       @if(in_array($child->file_type,['png','jpg','jpeg'])) data-src="{{route('show-image-from-storage',$child->file_path)}}" @endif
                        data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">{{$child->name}}</a>
                 </div>
             </td>
@@ -81,12 +87,12 @@
                         <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle ms-1 add-permission w-30px h-30px" data-bs-toggle="modal"
                            data-bs-target="#permission_modal_{{$child->id}}" data-bs-placement="top" title="Thêm quyền">
                             <svg class=" svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512" data-fa-i2svg=""
-                        style="display: inline-block; font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
-                        >
-                        <path fill="currentColor"
-                              d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
-                        </svg>
+                                 viewBox="0 0 448 512" data-fa-i2svg=""
+                                 style="display: inline-block; font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
+                            >
+                                <path fill="currentColor"
+                                      d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
+                            </svg>
                         </a>
                     </div>
                     <div class="modal fade" id="permission_modal_{{$child->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

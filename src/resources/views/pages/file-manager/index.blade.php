@@ -338,8 +338,6 @@
     </div>
     <!--end::Modal - Move file-->
     <!--end::Modals-->
-    <!--end::Card-->
-    <!--begin::Rename modal-->
     <!-- Modal -->
     <div class="modal fade" id="rename_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -471,6 +469,25 @@
     </div>
     <!--end::Modal - Move file-->
     <!--end::Modals-->
+    <!-- Modal -->
+    <div class="modal fade" id="show_image_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="imageModalLabel"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body align-self-center">
+                    <img src="..." class="img-fluid" alt="...">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary download">Tải</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Rename modal-->
 
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -538,7 +555,7 @@
             showRestoreButton()
         })
 
-        $(document).on('click', '.menu-toggle, .add-permission', function (event) {
+        $(document).on('click', '.menu-toggle, .add-permission, .preview-image', function (event) {
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
             tr = $(this).closest('tr');
             rowId = tr.data('id');
@@ -553,13 +570,13 @@
                     targetMenu.css({
                         position: 'absolute',
                         top: $(this).outerHeight() + 'px',
-                        right:'50px',
+                        right: '50px',
                     })
                 }
             }
             event.stopPropagation();
         });
-        $(document).on('click', function(event) {
+        $(document).on('click', function (event) {
             // Check if the clicked element is not a descendant of the menu or the menu toggle
             if (!$(event.target).closest('.menu').length && !$(event.target).hasClass('menu-toggle')) {
                 // Hide all menu-sub-dropdown elements
@@ -593,7 +610,7 @@
                 // Loop through each selected file
                 for (let i = 0; i < input.files.length; i++) {
                     const file = input.files[i];
-                    if (file.size > 5 * 1024) {
+                    if (file.size > 5 * 1024 * 1024) {
                         showToast('Kích thước tệp vượt quá giới hạn (5MB). Vui lòng chọn tệp nhỏ hơn', null, 'error')
                         return;
                     }
@@ -608,7 +625,7 @@
             }
         });
         $(document).on('click', '.download', function () {
-            const id = $(this).closest('tr').data('id');
+            const id = $(this).closest('tr').data('id') ?? rowId;
             let downloadUrl = "/ajax/download-file?id=" + id + "&type=" + navItemType;
             window.open(downloadUrl, '_blank');
         })
@@ -717,6 +734,18 @@
                     showToast(xhr.responseJSON.message, null, 'error')
                 }
             });
+        })
+
+        $(document).on('click', '.preview-pdf', function () {
+            const id = $(this).closest('tr').data('id');
+            let downloadUrl = "/ajax/preview-file?id=" + id;
+            window.open(downloadUrl, '_blank');
+        })
+
+        $(document).on('click', '.preview-image', function () {
+            const src = $(this).data('src');
+            $('#show_image_modal img').attr('src', src);
+            $('#show_image_modal').modal('show')
         })
 
         $('#btn_delete_selected').on('click', function () {
@@ -847,7 +876,7 @@
                     $('tbody').html(response.view)
                     $('#folder_path').html(response.folder_path)
                     $('#count_item').html(response.count_children.toString() + ' items')
-                    $('[data-bs-toggle="tooltip"]').tooltip();
+                    // $('[data-bs-toggle="tooltip"]').tooltip();
                     showDeleteButton();
                 },
                 error: function (xhr, status, error) {

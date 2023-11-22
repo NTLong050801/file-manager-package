@@ -4,6 +4,8 @@ namespace Ntlong050801\FileManager\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -360,6 +362,39 @@ class AjaxController extends Controller
         }
     }
 
+    public function preview(Request $request)
+    {
+        $privateFileId = User::find(auth()->id())->file->pluck('id')->toArray();
+        $shareFileId = User::find(auth()->id())->files->pluck('id')->toArray();
+        $request->validate([
+            'id' => ['required', 'integer', Rule::in(array_merge($privateFileId,$shareFileId))]
+        ]);
+        $file = FileManager::find($request->input('id'));
+        $filePath = storage_path('app/'.$file->file_path);
+        $type = $file->file_type;
+        if (file_exists($filePath) && $type === 'pdf') {
+            $headers = [
+                'Content-Type' => 'application/pdf',
+            ];
+            return response()->file($filePath, $headers);
+        } else {
+            // If the file doesn't exist, return a 404 response or handle it accordingly
+            return response()->json(['error' => 'File not found'], 404);
+        }
+    }
+
+    public function showImageFromStorage(string $pathFile){
+        $fullPath = storage_path('app/'.$pathFile);
+        if (!File::exists($fullPath)) {
+            return null;
+        }
+        $file = File::get($fullPath);
+        $type = File::mimeType($fullPath);
+
+        $response = Response::make($file);
+        $response->header("Content-Type", $type);
+        return $response;
+    }
     private function updateIsTrash(FileManager $fileManager, $value)
     {
         $fileManager->update([

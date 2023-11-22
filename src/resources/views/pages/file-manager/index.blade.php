@@ -537,20 +537,6 @@
             showRestoreButton()
         })
 
-//         $(document).on('click', function (event) {
-//             // Check if the clicked element is not within the menu or the button
-//             if (!$(event.target).closest('.menu-sub-dropdown').length && !$(event.target).hasClass('menu-toggle')) {
-//                 // Hide all menus
-//                 $('.menu-sub-dropdown').removeClass('show');
-//             }
-//         });
-//
-// // Prevent clicks inside the menu from closing it immediately
-//         $('.menu-sub-dropdown').on('click', function (event) {
-//             event.stopPropagation();
-//         });
-
-
         $(document).on('click', '.menu-toggle, .add-permission', function () {
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
             tr = $(this).closest('tr');

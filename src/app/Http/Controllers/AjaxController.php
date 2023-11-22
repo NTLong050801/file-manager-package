@@ -31,7 +31,7 @@ class AjaxController extends Controller
         switch ($type) {
             case  FileManager::TYPE_DELETE_FOLDER:
             {
-                $childrens = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
+                $children = $query->where('user_id', $userId)->where('is_direct_deleted', 1)->get();
                 $isTrash = true;
                 break;
             }
@@ -42,7 +42,7 @@ class AjaxController extends Controller
                 } else {
                     $parent = $query->where('id', $parentId)->first();
                 }
-                $childrens = $parent?->children()->where('is_trash', false)->get()->reverse();
+                $children = $parent?->children()->where('is_trash', false)->get()->reverse();
                 $finalPath = $this->processFolderPath($parent);
                 break;
             }
@@ -50,10 +50,10 @@ class AjaxController extends Controller
             {
                 $parent = $user->files->where('pivot.is_click_permission', true)->where('is_trash', false);
                 if (!empty($parentId)) {
-                    $childrens = $user->files->where('pivot.is_click_permission', false)->where('parent_id', $parentId)->where('is_trash', false);
+                    $children = $user->files->where('pivot.is_click_permission', false)->where('parent_id', $parentId)->where('is_trash', false);
                     $finalPath = $this->processFolderPath(FileManager::find($parentId));
                 } else {
-                    $childrens = $parent;
+                    $children = $parent;
                     $finalPath = $this->processFolderPath(null);
                 }
                 $isShare = true;
@@ -63,15 +63,15 @@ class AjaxController extends Controller
             {
                 if (!empty($parentId) && $parentId != (FileManager::where('user_id', $userId)->whereNull('parent_id')->first()->id)) {
                     if (!empty($user->files) && $user->files->where('pivot.file_id', $parentId)->count() > 0) {
-                        $childrens = $user->files->where('pivot.is_click_permission', false)->where('parent_id', $parentId)->where('is_trash', false);
+                        $children = $user->files->where('pivot.is_click_permission', false)->where('parent_id', $parentId)->where('is_trash', false);
                         $finalPath = $this->processFolderPath(FileManager::find($parentId));
                     } else {
                         $parent = $query->where('id', $parentId)->first();
-                        $childrens = $parent?->children()->where('is_trash', false)->get()->reverse();
+                        $children = $parent?->children()->where('is_trash', false)->get()->reverse();
                         $finalPath = $this->processFolderPath($parent);
                     }
                 } else {
-                    $childrens = FileManager::where(function ($query) use ($userId, $parentId) {
+                    $children = FileManager::where(function ($query) use ($userId, $parentId) {
 
                         // Các file thuộc sở hữu của bạn
                         if (empty($parentId)) {
@@ -82,7 +82,7 @@ class AjaxController extends Controller
                         $query->orWhereHas('users', function ($query) use ($userId) {
                             $query->where('user_id', $userId)->where('is_click_permission', true)->where('is_trash', false);
                         });
-                    })->get();
+                    })->orderByDesc('id')->get();
                 }
             }
         }
@@ -91,11 +91,11 @@ class AjaxController extends Controller
         $users = $users->reject(function ($user) use ($userId) {
             return $user->id == $userId;
         });
-        $view = view('file-manager::pages.file-manager.components.folder', compact('childrens', 'isTrash', 'isShare', 'users', 'userId'))->render();
+        $view = view('file-manager::pages.file-manager.components.folder', compact('children', 'isTrash', 'isShare', 'users', 'userId'))->render();
         return response()->json([
             'view' => $view,
             'folder_path' => $finalPath,
-            'count_children' => $childrens?->count(),
+            'count_children' => $children?->count(),
         ]);
 //        return view('file-manager::pages.file-manager.components.folder', compact('childrens'));
     }

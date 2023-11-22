@@ -1,6 +1,6 @@
-@if(!empty($childrens) && $childrens->count() > 0 )
-    @foreach($childrens as $children)
-        <tr class="even" data-id="{{$children->id}}">
+@if(!empty($children) && $children->count() > 0 )
+    @foreach($children as $child)
+        <tr class="even" data-id="{{$child->id}}">
             <!--begin::Checkbox-->
             <td>
                 <div class="form-check">
@@ -12,7 +12,7 @@
             <!--begin::Name=-->
             <td data-order="landing.html">
                 <div class="d-flex align-items-center">
-                    @if(empty($children->file_type))
+                    @if(empty($child->file_type))
                         {{--                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">--}}
                         <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,7 +21,7 @@
                         </svg>
                         </span>
                     @else
-                        @switch($children->file_type)
+                        @switch($child->file_type)
                             @case('doc')
                             @case('docx')
                                 <img src="{{asset('vendor/file-manager/image/word.svg')}}" width="35" height="30" alt="">
@@ -50,34 +50,34 @@
 
                     @endif
 
-                    <a href="#" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($children->file_type)) show-children @endif"
-                       data-type="{{$children->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$children->id}}">{{$children->name}}</a>
+                    <a href="#" class="text-gray-800 text-hover-primary ms-5 name-file @if(empty($child->file_type)) show-children @endif"
+                       data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">{{$child->name}}</a>
                 </div>
             </td>
             <!--end::Name=-->
             <td>
                 <div>
-                    <img src="{{$children->user->avatar}}" width="30" height="30" class="rounded-circle" alt=""
-                         data-bs-toggle="tooltip" data-bs-placement="top" title="{{$children->user->name}}"
+                    <img src="{{$child->user->avatar}}" width="30" height="30" class="rounded-circle" alt=""
+                         data-bs-toggle="tooltip" data-bs-placement="top" title="{{$child->user->name}}"
                     >
                 </div>
             </td>
             <!--begin::Size-->
-            <td>{{empty($children->file_type) ? null : $children->file_size}}</td>
+            <td>{{empty($child->file_type) ? null : $child->file_size}}</td>
             <!--end::Size-->
             <td>
-                @if($children->user_id == $userId && !$children->is_trash)
+                @if($child->user_id == $userId && !$child->is_trash)
                     {{--                    <button class="btn btn-sm btn-primary rounded-5 add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}"><i class="fa-solid fa-user-plus"></i></button>--}}
                     <div class="d-flex">
-                        @foreach($children->users->take(3) as $userFile)
+                        @foreach($child->users->take(3) as $userFile)
                             <div>
                                 <img src="{{$userFile->avatar}}" width="30" height="30" class="rounded-circle" alt=""
                                      data-bs-toggle="tooltip" data-bs-placement="top" title="{{$userFile->name}}"
                                 >
                             </div>
                         @endforeach
-                        <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle add-permission w-30px h-30px" data-bs-toggle="modal"
-                           data-bs-target="#permission_modal_{{$children->id}}">
+                        <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle ms-1 add-permission w-30px h-30px" data-bs-toggle="modal"
+                           data-bs-target="#permission_modal_{{$child->id}}">
                             <svg class="svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
                                  viewBox="0 0 448 512" data-fa-i2svg=""
                                  style="display: inline-block;    font-size: inherit;height: 1em;overflow: visible;vertical-align: -0.125em;"
@@ -87,12 +87,12 @@
                             </svg>
                         </a>
                     </div>
-                    <div class="modal fade" id="permission_modal_{{$children->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="permission_modal_{{$child->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <div class="card-title">
-                                        <h3 class="modal-title" style="color: #242C8A">Thêm quyền cho tệp "{{$children->name}}"</h3>
+                                        <h3 class="modal-title" style="color: #242C8A">Thêm quyền cho tệp "{{$child->name}}"</h3>
                                     </div>
                                     <div class="card-toolbar">
                                         <div class="position-relative">
@@ -113,7 +113,7 @@
                                                 <div class="col-3 col-md-2 col-sm-4 align-self-center">
                                                     <label for="mail_receiver" class="form-check form-check-custom me-10">
                                                         <input class="form-check-input border-black h-20px w-20px receiver-checkbox" data-id="{{$user->id}}" value="{{$user->id}}" type="checkbox"
-                                                               name="receiver[]" @if(in_array($user->id,$children->users->pluck('id')->toArray())) checked @endif >
+                                                               name="receiver[]" @if(in_array($user->id,$child->users->pluck('id')->toArray())) checked @endif >
                                                     </label>
                                                 </div>
                                                 <div class="col-9 col-md-9 col-sm-9 d-flex align-items-center col-md-10 col-sm-12">
@@ -135,20 +135,20 @@
                 @endif
             </td>
             <!--begin::Last modified-->
-            <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$children->created_at)->format('d/m/Y')}}</td>
+            <td>{{\Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s',$child->created_at)->format('d/m/Y')}}</td>
             <!--end::Last modified-->
             <td>
-                @if(sizeof($children->getPathFileIsTrash($children,$userId, $isTrash, $isShare)) > 0 || !empty($children->file_type))
+                @if(sizeof($child->getPathFileIsTrash($child,$userId, $isTrash, $isShare)) > 0 || !empty($child->file_type))
 {{--                    <button class="btn btn-sm btn-success download"><i class="fa-regular fa-circle-down fa-2xl"></i></button>--}}
                     <i class="fa-regular fa-circle-down text-success fs-2x download"></i>
                 @endif
             </td>
             <!--begin::Actions-->
             <td class="text-end" data-kt-filemanager-table="action_dropdown">
-                @if($children->user_id == $userId)
+                @if($child->user_id == $userId)
                     <div class="d-flex justify-content-end">
                         <!--begin::More-->
-                        <div class="ms-2 more" data-id="{{$children->id}}">
+                        <div class="ms-2 more" data-id="{{$child->id}}">
                             <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click"
                                     data-kt-menu-placement="bottom-end">
                                 <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
@@ -160,7 +160,7 @@
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
                                  data-kt-menu="true" style=" position: fixed;z-index: 100;right:100px">
-                                @if(!$children->is_direct_deleted)
+                                @if(!$child->is_direct_deleted)
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3">
                                         <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>

@@ -45,20 +45,22 @@
                     <div class="modal fade" id="create_folder_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Tạo mới thư mục</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <label class="form-label mb-2" for="value">
-                                        <span class="required">Tên thư mục</span>
-                                    </label>
-                                    <input class="form-control" id="name_folder" placeholder="Nhập tên thư mục" name="name" required/>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    <button type="button" class="btn btn-primary" id="btn_store_folder">Tạo mới</button>
-                                </div>
+                                <form id="create_folder_form">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Tạo mới thư mục</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <label class="form-label mb-2" for="value">
+                                            <span class="required">Tên thư mục</span>
+                                        </label>
+                                        <input class="form-control" id="name_folder" placeholder="Nhập tên thư mục" name="name" required />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary" id="btn_store_folder">Tạo mới</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -249,142 +251,27 @@
         </div>
     </div>
     <!--end::Modal - Upload File-->
-    <!--begin::Modal - New Product-->
-    <div class="modal fade" id="kt_modal_move_to_folder" tabindex="-1" aria-hidden="true">
-        <!--begin::Modal dialog-->
-        <div class="modal-dialog modal-dialog-centered mw-650px">
-            <!--begin::Modal content-->
-            <div class="modal-content">
-                <!--begin::Form-->
-                <form class="form fv-plugins-bootstrap5 fv-plugins-framework" action="#" id="kt_modal_move_to_folder_form">
-                    <!--begin::Modal header-->
-                    <div class="modal-header">
-                        <!--begin::Modal title-->
-                        <h2 class="fw-bold">Move to folder</h2>
-                        <!--end::Modal title-->
-                        <!--begin::Close-->
-                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
-                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-                            <span class="svg-icon svg-icon-1">
-                                    <img src="{{asset('assets/media/icons/duotune/arrows/arr061.svg')}}" alt="">
-                                </span>
-                            <!--end::Svg Icon-->
-                        </div>
-                        <!--end::Close-->
-                    </div>
-                    <!--end::Modal header-->
-                    <!--begin::Modal body-->
-                    <div class="modal-body pt-10 pb-15 px-lg-17">
-                        <!--begin::Input group-->
-                        <div class="form-group fv-row fv-plugins-icon-container">
-                            <!--begin::Item-->
-                            <div class="d-flex">
-                                <!--begin::Checkbox-->
-                                <div class="form-check form-check-custom form-check-solid">
-                                    <!--begin::Input-->
-                                    <input class="form-check-input me-3" name="move_to_folder" type="radio" value="0" id="kt_modal_move_to_folder_0">
-                                    <!--end::Input-->
-                                    <!--begin::Label-->
-                                    <label class="form-check-label" for="kt_modal_move_to_folder_0">
-                                        <div class="fw-bold">
-                                            <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                                            <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">
-                                                </span>
-                                            <!--end::Svg Icon-->account
-                                        </div>
-                                    </label>
-                                    <!--end::Label-->
-                                </div>
-                                <!--end::Checkbox-->
-                            </div>
-                            <!--end::Item-->
-                            <div class="separator separator-dashed my-5"></div>
-                            <!--begin::Item-->
-                            <div class="d-flex">
-                                <!--begin::Checkbox-->
-                                <div class="form-check form-check-custom form-check-solid">
-                                    <!--begin::Input-->
-                                    <input class="form-check-input me-3" name="move_to_folder" type="radio" value="1" id="kt_modal_move_to_folder_1">
-                                    <!--end::Input-->
-                                    <!--begin::Label-->
-                                    <label class="form-check-label" for="kt_modal_move_to_folder_1">
-                                        <div class="fw-bold">
-                                            <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                                            <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">
-                                                </span>
-                                            <!--end::Svg Icon-->apps
-                                        </div>
-                                    </label>
-                                    <!--end::Label-->
-                                </div>
-                                <!--end::Checkbox-->
-                            </div>
-                            <!--end::Item-->
-                            <div class="separator separator-dashed my-5"></div>
-                            <!--begin::Item-->
-                            <div class="d-flex">
-                                <!--begin::Checkbox-->
-                                <div class="form-check form-check-custom form-check-solid">
-                                    <!--begin::Input-->
-                                    <input class="form-check-input me-3" name="move_to_folder" type="radio" value="2" id="kt_modal_move_to_folder_2">
-                                    <!--end::Input-->
-                                    <!--begin::Label-->
-                                    <label class="form-check-label" for="kt_modal_move_to_folder_2">
-                                        <div class="fw-bold">
-                                            <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                                            <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">
-                                                </span>
-                                            <!--end::Svg Icon-->widgets
-                                        </div>
-                                    </label>
-                                    <!--end::Label-->
-                                </div>
-                                <!--end::Checkbox-->
-                            </div>
-
-                        </div>
-                        <!--end::Input group-->
-                        <!--begin::Action buttons-->
-                        <div class="d-flex flex-center mt-12">
-                            <!--begin::Button-->
-                            <button type="button" class="btn btn-primary" id="kt_modal_move_to_folder_submit">
-                                <span class="indicator-label">Save</span>
-                                <span class="indicator-progress">Please wait...
-																<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                            </button>
-                            <!--end::Button-->
-                        </div>
-                        <!--begin::Action buttons-->
-                    </div>
-                    <!--end::Modal body-->
-                </form>
-                <!--end::Form-->
-            </div>
-        </div>
-    </div>
-    <!--end::Modal - Move file-->
     <!--end::Modals-->
     <!-- Modal -->
     <div class="modal fade" id="rename_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi tên thư mục/ tệp</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label mb-2" for="value">
-                        <span class="required">Tên thư mục/ tệp</span>
-                    </label>
-                    <input class="form-control" id="name_folder_rename" placeholder="Nhập tên thư mục" name="name" required/>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" id="btn_update_folder">Đổi tên</button>
-                </div>
+                <form id="rename_folder_form">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Đổi tên thư mục/ tệp</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label mb-2" for="value">
+                            <span class="required">Tên thư mục/ tệp</span>
+                        </label>
+                        <input class="form-control" id="name_folder_rename" placeholder="Nhập tên thư mục" name="name" required/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary" id="btn_update_folder">Đổi tên</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -400,17 +287,17 @@
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
-                        <h2 class="fw-bold">Move to folder</h2>
+                        <h2 class="fw-bold">Chuyển thư mục</h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
                         <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
                             <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
                             <span class="svg-icon svg-icon-1">
-																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 																	<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
 																	<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
 																</svg>
-															</span>
+                            </span>
                             <!--end::Svg Icon-->
                         </div>
                         <!--end::Close-->
@@ -440,34 +327,6 @@
 																			</svg>
 																		</span>
                                             <!--end::Svg Icon-->account
-                                        </div>
-                                    </label>
-                                    <!--end::Label-->
-                                </div>
-                                <!--end::Checkbox-->
-                            </div>
-                            <!--end::Item-->
-                            <div class="fv-plugins-message-container invalid-feedback"></div>
-                            <!--begin::Item-->
-                            <div class="d-flex">
-                                <!--begin::Checkbox-->
-                                <div class="form-check form-check-custom form-check-solid">
-                                    <!--begin::Input-->
-                                    <input class="form-check-input me-3" name="move_to_folder" type="radio" value="9" id="kt_modal_move_to_folder_9">
-                                    <!--end::Input-->
-                                    <!--begin::Label-->
-                                    <label class="form-check-label" for="kt_modal_move_to_folder_9">
-                                        <div class="fw-bold">
-                                            <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                                            <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-																			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																				<path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
-																				<path
-                                                                                    d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z"
-                                                                                    fill="currentColor"></path>
-																			</svg>
-																		</span>
-                                            <!--end::Svg Icon-->pages
                                         </div>
                                     </label>
                                     <!--end::Label-->
@@ -579,6 +438,11 @@
                             showToast("Đã vượt quá số lượng tải lên song song tối đa.", null, 'error');
                             this.removeFile(file); // Remove the exceeded file from the queue
                         }
+                        const duplicateCount = this.files.reduce((count, f) => (f.name === file.name ? count + 1 : count), 0);
+                        if (duplicateCount > 1) {
+                            showToast("File đã tồn tại.", null, 'error');
+                            this.removeFile(file);
+                        }
                     });
                 }
             });
@@ -629,7 +493,7 @@
             dropzone.querySelector(".dropzone-upload").addEventListener('click', function () {
                 myDropzone.files.forEach(file => {
                     console.log(file)
-                    if (file.status === 'added'){
+                    if (file.status === 'added') {
                         myDropzone.enqueueFile(file);
                         const progressBar = file.previewElement.querySelector('.progress-bar');
                         progressBar.style.opacity = "1";
@@ -713,19 +577,20 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         });
-        $('#btn_store_folder').on('click', function () {
+
+        $('#create_folder_form').on('submit', function (event) {
+            event.preventDefault();
             const name = $('#name_folder').val();
             if (!name) {
-                showToast("Không để trống tên thư mục!", null, 'error')
+                showToast("Không để trống tên thư mục!", null, 'error');
             } else {
                 let formData = new FormData();
-                formData.append('name', name)
-                formData.append('parent_id', parentId)
-                formData.append('user_id', userId)
-                createFolder(formData)
+                formData.append('name', name);
+                formData.append('parent_id', parentId);
+                formData.append('user_id', userId);
+                createFolder(formData);
             }
-
-        })
+        });
 
         $(document).on('click', '.show-children', function (e) {
             e.preventDefault();
@@ -791,11 +656,12 @@
         });
         $(document).on('click', '.rename', function () {
             const name = tr.find('.name-file').text()
-            $('#name_folder_rename').val(name);
+            $('#name_folder_rename').val(name.trim());
             $('#rename_modal').modal('show')
         })
 
-        $('#btn_update_folder').on('click', function () {
+        $('#rename_folder_form').on('submit', function (event) {
+            event.preventDefault();
             const name = $('#name_folder_rename').val();
             if (!name) {
                 showToast("Không để trống trường tên!", null, 'error')
@@ -805,7 +671,7 @@
                 formData.append('id', rowId)
                 formData.append('_method', 'PATCH')
                 renameFile(formData)
-                tr.find('.name-file').text(name)
+                tr.find('.sp-name-file').text(name)
             }
         })
 
@@ -913,7 +779,7 @@
                     is_active: is_active,
                 },
                 success: function (response) {
-                    showToast('Thành công', 'Đã cập nhật thành công', 'success')
+                    showToast('Thành công', 'Đã cập nhật thành công', 'success');
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
@@ -931,6 +797,10 @@
             const src = $(this).data('src');
             $('#show_image_modal img').attr('src', src);
             $('#show_image_modal').modal('show')
+        })
+
+        $(document).on('click','.move-file',function () {
+            $('.kt_modal_move_to_folder').modal('show')
         })
 
         $('#btn_delete_selected').on('click', function () {
@@ -1066,6 +936,7 @@
                     // $('[data-bs-toggle="tooltip"]').tooltip();
                     showDeleteButton();
                     KTApp.hidePageLoading();
+
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
@@ -1117,6 +988,7 @@
                 success: function () {
                     loadFolder()
                     showToast("Xoá thành công", null, 'success')
+                    showRestoreButton();
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

@@ -14,52 +14,54 @@
             <!--begin::Name=-->
             <td data-order="landing.html">
                 <div class="d-flex align-items-center">
-                    @if(empty($child->file_type))
-                        {{--                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">--}}
-                        <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
-                            <path d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z" fill="currentColor"></path>
-                        </svg>
-                        </span>
-                    @else
-                        @switch($child->file_type)
-                            @case('doc')
-                            @case('docx')
-                                <img src="{{asset('vendor/file-manager/image/word.svg')}}" width="35" height="30" alt="">
-                                @break
-                            @case('xlsx')
-                            @case('xls')
-                                <img src="{{asset('vendor/file-manager/image/excel.svg')}}" width="35" height="30" alt="">
-                                @break
-                            @case('pdf')
-                                <img src="{{asset('vendor/file-manager/image/pdf.svg')}}" width="35" height="30" alt="">
-                                @break
-                            @case('jpeg')
-                            @case('png')
-                            @case('jpg')
-                            @case('gif')
-                                <img src="{{asset('vendor/file-manager/image/image_thumb.svg')}}" width="35" height="30" alt="">
-                                @break
-                            @default
-                                <!--begin::Svg Icon | path: icons/duotune/files/fil003.svg-->
-                                <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-                                    <img src="{{asset('assets/media/icons/duotune/files/fil003.svg')}}" alt="">
-                                </span>
-                                <!--end::Svg Icon-->
-                                @break
-                        @endswitch
-
-                    @endif
 
                     <a href="javascript:void(0)"
                        class="text-gray-800 text-hover-primary ms-5 name-file @switch($child->file_type) @case('pdf')  preview-pdf  @break
                         @case('jpeg')
                         @case('png')
                         @case('jpg')
-                        @case('gif') preview-image @break @default show-children @endswitch"
+                        @case('gif') preview-image @break @case(null) show-children @break @default @endswitch"
                        @if(in_array($child->file_type,['png','jpg','jpeg'])) data-src="{{route('file-manager.show-image-from-storage',$child->file_path)}}" @endif
-                       data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">{{$child->name}}</a>
+                       data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">
+                        @if(empty($child->file_type))
+                            {{--                    <img src="{{asset('assets/media/icons/duotune/files/fil012.svg')}}" alt="">--}}
+                            <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
+                            <path d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z" fill="currentColor"></path>
+                        </svg>
+                        </span>
+                        @else
+                            @switch($child->file_type)
+                                @case('doc')
+                                @case('docx')
+                                    <img src="{{asset('vendor/file-manager/image/word.svg')}}" width="35" height="30" alt="">
+                                    @break
+                                @case('xlsx')
+                                @case('xls')
+                                    <img src="{{asset('vendor/file-manager/image/excel.svg')}}" width="35" height="30" alt="">
+                                    @break
+                                @case('pdf')
+                                    <img src="{{asset('vendor/file-manager/image/pdf.svg')}}" width="35" height="30" alt="">
+                                    @break
+                                @case('jpeg')
+                                @case('png')
+                                @case('jpg')
+                                @case('gif')
+                                    <img src="{{asset('vendor/file-manager/image/image_thumb.svg')}}" width="35" height="30" alt="">
+                                    @break
+                                @default
+                                    <!--begin::Svg Icon | path: icons/duotune/files/fil003.svg-->
+                                    <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
+                                    <img src="{{asset('assets/media/icons/duotune/files/fil003.svg')}}" alt="">
+                                </span>
+                                    <!--end::Svg Icon-->
+                                    @break
+                            @endswitch
+
+                        @endif
+                        <span class="sp-name-file">{{$child->name}}</span>
+                    </a>
                 </div>
             </td>
             <!--end::Name=-->
@@ -95,7 +97,7 @@
                             </svg>
                         </a>
                     </div>
-                    <div class="modal fade" id="permission_modal_{{$child->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade modal-permission" id="permission_modal_{{$child->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -174,12 +176,12 @@
                                         <a href="#" class="menu-link px-3 rename" data-kt-filemanager-table="rename">Đổi tên</a>
                                     </div>
                                     <!--end::Menu item-->
-                                    {{--                                    <!--begin::Menu item-->--}}
-                                    {{--                                    <div class="menu-item px-3">--}}
-                                    {{--                                        <a href="#" class="menu-link px-3" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"--}}
-                                    {{--                                           data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>--}}
-                                    {{--                                    </div>--}}
-                                    {{--                                    <!--end::Menu item-->--}}
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3 move-file" data-kt-filemanager-table-filter="move_row" data-bs-toggle="modal"
+                                           data-bs-target="#kt_modal_move_to_folder">Di chuyển</a>
+                                    </div>
+                                    <!--end::Menu item-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 pt-0 pb-0">
                                         <a href="#" class="menu-link text-danger px-3 delete" data-kt-filemanager-table-filter="delete_row">Xoá</a>
@@ -188,12 +190,12 @@
                                 @else
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 pt-0 pb-0">
-                                        <a href="#" class="menu-link px-3 pt-0 pb-0 restore">Khôi phục</a>
+                                        <a href="#" class="menu-link px-3 restore">Khôi phục</a>
                                     </div>
                                     <!--end::Menu item-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 pt-0 pb-0">
-                                        <a href="#" class="menu-link px-3 pt-0 pb-0 text-danger destroy">Xoá vĩnh viễn</a>
+                                        <a href="#" class="menu-link px-3 text-danger destroy">Xoá vĩnh viễn</a>
                                     </div>
                                     <!--end::Menu item-->
                                 @endif

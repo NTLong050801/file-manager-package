@@ -5,6 +5,7 @@
     <link href="{{asset('vendor/file-manager/css/plugins.bundle.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('vendor/file-manager/css/style.bundle.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('vendor/file-manager/css/datatables.bundle.css')}}" rel="stylesheet" type="text/css"/>
+    {{--    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />--}}
 </head>
 <div id="kt_app_content_container" class="app-container container-xxl">
     <!--begin::Card-->
@@ -68,7 +69,7 @@
                         <span class="svg-icon svg-icon-2">
                                 <img src="{{asset('assets/media/icons/duotune/files/fil018.svg')}}" alt="">
 							</span>
-                        <!--end::Svg Icon-->Upload Files
+                        <!--end::Svg Icon-->Tải file
                     </button>
                     <!--end::Add customer-->
                 </div>
@@ -173,7 +174,7 @@
                     <!--begin::Modal header-->
                     <div class="modal-header">
                         <!--begin::Modal title-->
-                        <h2 class="fw-bold">Upload files</h2>
+                        <h2 class="fw-bold">Tải file</h2>
                         <!--end::Modal title-->
                         <!--begin::Close-->
                         <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
@@ -192,27 +193,55 @@
                         <div class="form-group">
                             <!--begin::Dropzone-->
                             <div class="dropzone dropzone-queue mb-2" id="kt_modal_upload_dropzone">
+                                <!--begin::Controls-->
+                                <div class="dropzone-panel mb-4">
+                                    <a class="dropzone-select btn btn-sm btn-primary me-2">Đính kèm tập tin</a>
+                                    <a class="dropzone-upload btn btn-sm btn-light-primary me-2">Tải tất cả</a>
+                                    <a class="dropzone-remove-all btn btn-sm btn-light-primary">Xoá tất cả</a>
+                                </div>
+                                <!--end::Controls-->
                                 <!--begin::Items-->
                                 <div class="dropzone-items wm-200px">
-                                    <div class="mb-3">
-                                        <label for="formFileMultiple" class="form-label">Chọn file</label>
-                                        <input class="form-control" type="file" id="formFileMultiple" name="files[]" multiple
-                                               accept="image/*, .doc,.docx,.pdf"
-                                        >
+                                    <div class="dropzone-item p-5" style="display:none">
+                                        <!--begin::File-->
+                                        <div class="dropzone-file">
+                                            <div class="dropzone-filename text-dark" title="some_image_file_name.jpg">
+                                                <span data-dz-name="">some_image_file_name.jpg</span>
+                                                <strong>(
+                                                    <span data-dz-size="">340kb</span>)</strong>
+                                            </div>
+                                            <div class="dropzone-error mt-0" data-dz-errormessage=""></div>
+                                        </div>
+                                        <!--end::File-->
+                                        <!--begin::Progress-->
+                                        <div class="dropzone-progress">
+                                            <div class="progress bg-light-primary">
+                                                <div class="progress-bar bg-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-dz-uploadprogress=""></div>
+                                            </div>
+                                        </div>
+                                        <!--end::Progress-->
+                                        <!--begin::Toolbar-->
+                                        <div class="dropzone-toolbar">
+                                            <span class="dropzone-start">
+                                                <i class="bi bi-play-fill fs-3"></i>
+                                            </span>
+                                            <span class="dropzone-cancel" data-dz-remove="" style="display: none;">
+                                                <i class="bi bi-x fs-3"></i>
+                                            </span>
+                                            <span class="dropzone-delete" data-dz-remove="">
+                                                <i class="bi bi-x fs-1"></i>
+                                            </span>
+                                        </div>
+                                        <!--end::Toolbar-->
                                     </div>
                                 </div>
+                                <!--end::Items-->
                             </div>
                             <!--end::Dropzone-->
                             <!--begin::Hint-->
-                            <span class="form-text fs-6 text-muted">Max file size is 1MB per file.</span>
-                            <!--end::Hint-->
+                            <span class="form-text fs-6 text-muted">Kích thước tệp tối đa là 5MB mỗi tệp, tối đa 5 tệp.</span>
                         </div>
                         <!--end::Input group-->
-                    </div>
-                    <!--end::Modal body-->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="button" class="btn btn-primary" id="btn_upload_file">Upload</button>
                     </div>
                 </form>
                 <!--end::Form-->
@@ -478,7 +507,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body align-self-center">
-                    <img src="..." class="img-fluid" alt="...">
+                    <img src="#" class="img-fluid" alt="...">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -502,6 +531,183 @@
         let rowId;
         let tr;
         let navItemType = "all-folder";
+        const initDropzone = () => {
+            // set the dropzone container id
+            const id = "#kt_modal_upload_dropzone";
+            const dropzone = document.querySelector(id);
+
+            var previewNode = dropzone.querySelector(".dropzone-item");
+            previewNode.id = "";
+            var previewTemplate = previewNode.parentNode.innerHTML;
+            previewNode.parentNode.removeChild(previewNode);
+
+            var myDropzone = new Dropzone(id, { // Make the whole body a dropzone
+                url: "{{route('ajax.upload-file')}}", // Set the url for your upload script location
+                parallelUploads: 5,
+                acceptedFiles: 'application/msword, text/csv, ' +
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, ' +
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document, ' +
+                    'application/pdf, application/vnd.ms-powerpoint, application/vnd.oasis.opendocument.text, ' +
+                    'application/vnd.oasis.opendocument.spreadsheet, ' +
+                    'application/vnd.oasis.opendocument.presentation, image/jpeg, ' +
+                    'image/png, image/jpg, image/gif',
+                dictInvalidFileType: "Loại tệp không hợp lệ. Vui lòng tải lên các tập tin thuộc loại .doc, .csv, .xlsx, .xls, .docx, .pdf, .ppt, .odt, .ods, .odp, .jpeg, .png, .jpg, .gif",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                params: {
+                    parent_id: parentId,
+                },
+                previewTemplate: previewTemplate,
+                maxFilesize: 5, // Max filesize in MB
+                dictFileTooBig: "Tệp quá lớn. Kích thước tối đa là 5MB.",
+                autoProcessQueue: false, // Stop auto upload
+                autoQueue: false, // Make sure the files aren't queued until manually added
+                previewsContainer: id + " .dropzone-items", // Define the container to display the previews
+                clickable: id + " .dropzone-select", // Define the element that should be used as click trigger to select files.
+                init: function () {
+                    this.on("error", function (file, errorMessage, xhr) {
+                        var errorContainer = file.previewElement.querySelector('.dropzone-error');
+
+                        // If the error container exists, update its content with the error message
+                        if (errorContainer) {
+                            errorContainer.innerText = errorMessage.message || errorMessage;
+                        }
+                    });
+                    this.on("addedfile", function (file) {
+                        if (this.files.length > this.options.parallelUploads) {
+                            showToast("Đã vượt quá số lượng tải lên song song tối đa.", null, 'error');
+                            this.removeFile(file); // Remove the exceeded file from the queue
+                        }
+                    });
+                }
+            });
+
+            myDropzone.on("addedfile", function (file) {
+                updateParentId(parentId);
+                // Hook each start button
+                file.previewElement.querySelector(id + " .dropzone-start").onclick = function () {
+                    // myDropzone.enqueueFile(file);
+                    myDropzone.processFile(file);
+                    // Process simulation for demo only
+                    const progressBar = file.previewElement.querySelector('.progress-bar');
+                    progressBar.style.opacity = "1";
+                    var width = 1;
+                    var timer = setInterval(function () {
+                        if (width >= 100) {
+                            myDropzone.emit("success", file);
+                            myDropzone.emit("complete", file);
+                            clearInterval(timer);
+                        } else {
+                            width++;
+                            progressBar.style.width = width + '%';
+                        }
+                    }, 20);
+                };
+
+                const dropzoneItems = dropzone.querySelectorAll('.dropzone-item');
+                dropzoneItems.forEach(dropzoneItem => {
+                    dropzoneItem.style.display = '';
+                });
+                dropzone.querySelector('.dropzone-upload').style.display = "inline-block";
+                dropzone.querySelector('.dropzone-remove-all').style.display = "inline-block";
+            });
+
+            // Hide the total progress bar when nothing's uploading anymore
+            myDropzone.on("complete", function (file) {
+                const progressBars = dropzone.querySelectorAll('.dz-complete');
+                setTimeout(function () {
+                    progressBars.forEach(progressBar => {
+                        progressBar.querySelector('.progress-bar').style.opacity = "0";
+                        progressBar.querySelector('.progress').style.opacity = "0";
+                        progressBar.querySelector('.dropzone-start').style.opacity = "0";
+                    });
+                }, 300);
+            });
+
+            // Setup the buttons for all transfers
+            dropzone.querySelector(".dropzone-upload").addEventListener('click', function () {
+                myDropzone.files.forEach(file => {
+                    console.log(file)
+                    if (file.status === 'added'){
+                        myDropzone.enqueueFile(file);
+                        const progressBar = file.previewElement.querySelector('.progress-bar');
+                        progressBar.style.opacity = "1";
+                        var width = 1;
+                        var timer = setInterval(function () {
+                            if (width >= 100) {
+                                myDropzone.emit("success", file);
+                                myDropzone.emit("complete", file);
+                                clearInterval(timer);
+                            } else {
+                                width++;
+                                progressBar.style.width = width + '%';
+                            }
+                        }, 20);
+                    }
+                });
+                myDropzone.processQueue();
+            });
+
+            // Setup the button for remove all files
+            dropzone.querySelector(".dropzone-remove-all").addEventListener('click', function () {
+                Swal.fire({
+                    text: "Bạn có chắc chắn muốn xóa tất cả các tập tin?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "OK, xoá!",
+                    cancelButtonText: "Không, Huỷ",
+                    customClass: {
+                        confirmButton: "btn btn-primary",
+                        cancelButton: "btn btn-danger"
+                    }
+                }).then(function (result) {
+                    if (result.value) {
+                        dropzone.querySelector('.dropzone-upload').style.display = "none";
+                        dropzone.querySelector('.dropzone-remove-all').style.display = "none";
+                        myDropzone.removeAllFiles(true);
+                    }
+                });
+            });
+
+            // On all files completed upload
+            myDropzone.on("queuecomplete", function (progress) {
+                const uploadIcons = dropzone.querySelectorAll('.dropzone-upload');
+                uploadIcons.forEach(uploadIcon => {
+                    uploadIcon.style.display = "none";
+                });
+
+            });
+
+            // On all files removed
+            myDropzone.on("removedfile", function (file) {
+                if (myDropzone.files.length < 1) {
+                    dropzone.querySelector('.dropzone-upload').style.display = "none";
+                    dropzone.querySelector('.dropzone-remove-all').style.display = "none";
+                }
+            });
+
+            myDropzone.on("success", function (file, response) {
+                if (response) {
+                    showToast(response.message, null, 'success');
+                    loadFolder();
+                }
+            });
+
+            myDropzone.on("error", function (file, errorMessage, xhr) {
+                if (typeof errorMessage === 'object' && errorMessage.message) {
+                    showToast(errorMessage.message, null, 'error');
+                } else {
+                    showToast(errorMessage, null, 'error');
+                }
+            });
+
+            function updateParentId(newParentId) {
+                myDropzone.options.params.parent_id = newParentId;
+            }
+        }
+        initDropzone();
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': csrfToken
@@ -603,30 +809,9 @@
             }
         })
 
-        $('#btn_upload_file').on('click', function () {
-            const input = $('#formFileMultiple')[0];
-            // Check if files are selected
-            if (input.files.length > 0) {
-                // Loop through each selected file
-                for (let i = 0; i < input.files.length; i++) {
-                    const file = input.files[i];
-                    if (file.size > 5 * 1024 * 1024) {
-                        showToast('Kích thước tệp vượt quá giới hạn (5MB). Vui lòng chọn tệp nhỏ hơn', null, 'error')
-                        return;
-                    }
-                }
-
-                const formData = new FormData($('#modal_upload_form')[0]);
-                formData.append('parent_id', parentId)
-                formData.append('user_id', userId)
-                uploadFile(formData)
-            } else {
-                showToast('Vui lòng chọn ít nhất một tệp', null, 'error')
-            }
-        });
         $(document).on('click', '.download', function () {
             const id = $(this).closest('tr').data('id') ?? rowId;
-            let downloadUrl = "/ajax/download-file?id=" + id + "&type=" + navItemType;
+            let downloadUrl = "/file-manager/download-file?id=" + id + "&type=" + navItemType;
             window.open(downloadUrl, '_blank');
         })
 
@@ -738,7 +923,7 @@
 
         $(document).on('click', '.preview-pdf', function () {
             const id = $(this).closest('tr').data('id');
-            let downloadUrl = "/ajax/preview-file?id=" + id;
+            let downloadUrl = "/file-manager/preview-file?id=" + id;
             window.open(downloadUrl, '_blank');
         })
 
@@ -813,7 +998,7 @@
         })
         $('#btn_export_selected').on('click', function () {
             const listIds = getListIdsChecked().join('-');
-            let downloadUrl = "/ajax/download-multiple-files?ids=" + listIds;
+            let downloadUrl = "/file-manager/download-multiple-files?ids=" + listIds;
             window.open(downloadUrl, '_blank');
         })
         const showDeleteButton = () => {
@@ -865,12 +1050,14 @@
             });
         }
         const loadFolder = () => {
+            KTApp.showPageLoading();
             $.ajax({
                 url: "/ajax/children",
                 method: "GET",
                 data: {
                     'parent_id': parentId,
                     'type': navItemType,
+                    'user_id': userId,
                 },
                 success: function (response) {
                     $('tbody').html(response.view)
@@ -878,9 +1065,11 @@
                     $('#count_item').html(response.count_children.toString() + ' items')
                     // $('[data-bs-toggle="tooltip"]').tooltip();
                     showDeleteButton();
+                    KTApp.hidePageLoading();
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
+                    KTApp.hidePageLoading();
                 }
             })
         }
@@ -896,24 +1085,6 @@
                     $('#name_folder').val('')
                     loadFolder(parentId)
                     showToast('Tạo thư mục thành công', null, 'success')
-                },
-                error: function (xhr, status, error) {
-                    showToast(xhr.responseJSON.message, null, 'error')
-                }
-            });
-        }
-        const uploadFile = (formData) => {
-            $.ajax({
-                url: '{{route('ajax.upload-file')}}',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function () {
-                    loadFolder()
-                    showToast("Tải file thành công", null, 'success')
-                    $('#formFileMultiple').val(null)
-                    $('#kt_modal_upload').modal('hide')
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

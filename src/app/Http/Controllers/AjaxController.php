@@ -24,7 +24,7 @@ class AjaxController extends Controller
         $isTrash = false;
         $isShare = false;
         $type = $request->input('type');
-        $userId = auth()->id();
+        $userId = auth()->id() ?? $request->input('user_id');
         $parentId = $request->input('parent_id');
         $user = User::find($userId);
         switch ($type) {
@@ -166,7 +166,7 @@ class AjaxController extends Controller
     public function uploadFile(Request $request)
     {
         $request->validate([
-            'files.*' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:5120',
+            'file' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:5120',
         ]);
         try {
             if (empty($request->input('parent_id'))) {
@@ -175,34 +175,30 @@ class AjaxController extends Controller
                 $parentId = $request->input('parent_id');
             }
             $path = FileManager::findOrFail($parentId)->file_path;
-            foreach ($request->file('files') as $file) {
-                // Get the file size in bytes
-                $fileSize = $file->getSize();
-                $fileType = $file->getClientOriginalExtension();
-                $originalName = $file->getClientOriginalName();
-                $name = pathinfo($originalName, PATHINFO_FILENAME);
-                $fileCount = $this->checkExitsNameInFolder($parentId, $name);
-                if ($fileCount >= 1) {
-                    return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
-                }
-                Storage::putFileAs($path, $file, $originalName);
-
-                // For example, assuming you have a FileManager model:
-                FileManager::create([
-                    'name' => $name,
-                    'file_path' => $path.'/'.$originalName,
-                    'file_type' => $fileType,
-                    'file_size' => $fileSize,
-                    'parent_id' => $parentId,
-                    'user_id' => auth()->id(),
-                ]);
+            $file = $request->file('file');
+            $fileSize = $file->getSize();
+            $fileType = $file->getClientOriginalExtension();
+            $originalName = $file->getClientOriginalName();
+            $name = pathinfo($originalName, PATHINFO_FILENAME);
+            $fileCount = $this->checkExitsNameInFolder($parentId, $name);
+            if ($fileCount >= 1) {
+                return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
             }
+            Storage::putFileAs($path, $file, $originalName);
+            // For example, assuming you have a FileManager model:
+            FileManager::create([
+                'name' => $name,
+                'file_path' => $path.'/'.$originalName,
+                'file_type' => $fileType,
+                'file_size' => $fileSize,
+                'parent_id' => $parentId,
+                'user_id' => auth()->id(),
+            ]);
+            return response()->json(['message' => 'Upload file thành công']);
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
     }
-
-
 
     public function trash(Request $request)
     {

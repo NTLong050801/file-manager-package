@@ -58,7 +58,7 @@
                         @case('png')
                         @case('jpg')
                         @case('gif') preview-image @break @default show-children @endswitch"
-                       @if(in_array($child->file_type,['png','jpg','jpeg'])) data-src="{{route('show-image-from-storage',$child->file_path)}}" @endif
+                       @if(in_array($child->file_type,['png','jpg','jpeg'])) data-src="{{route('file-manager.show-image-from-storage',$child->file_path)}}" @endif
                        data-type="{{$child->users->where('pivot.user_id',$userId)->count() > 0 ? 'share-folder' : 'private-folder'}}" data-id="{{$child->id}}">{{$child->name}}</a>
                 </div>
             </td>

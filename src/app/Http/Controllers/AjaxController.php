@@ -131,10 +131,15 @@ class AjaxController extends Controller
             $file = FileManager::findOrFail($request->input('file_id'));
             $folderId = $request->input('folder_id');
             $parent = $folderId ? FileManager::find($folderId) : FileManager::root();
+            $fileCount = $this->checkExitsNameInFolder($parent->id, $file->name);
+
+            if ($fileCount >= 1) {
+                return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
+            }
             $this->processMoveFile($file, $parent);
 
         } catch (\Exception $exception) {
-
+            return $exception->getMessage();
         }
     }
 
@@ -260,6 +265,22 @@ class AjaxController extends Controller
                 $file = FileManager::findOrFail($id);
                 $root = FileManager::root();
                 if ($file->parent->is_direct_deleted) {
+                    $fileCount = $this->checkExitsNameInFolder($file->parent_id, $file->name);
+                    if ($fileCount >= 1) {
+                        $currentFilePath = $file->file_path;
+                        $newFileName = $file->name.' ('.$fileCount.')';
+                        $directory = pathinfo($currentFilePath, PATHINFO_DIRNAME);
+                        $newFilePath = $directory.'/'.$newFileName;
+                        if (!empty($file->file_type)) {
+                            $newFilePath = $newFilePath.".$file->file_type";
+                        }
+                        Storage::move($currentFilePath, $newFilePath);
+                        $file->update([
+                            'name' => $newFileName,
+                            'file_path' => $newFilePath,
+                        ]);
+                        $this->updateFilePathWhenRename($file, $currentFilePath, $newFilePath);
+                    }
                     $this->processMoveFile($file, $root);
                 }
                 $file->update([
@@ -396,27 +417,33 @@ class AjaxController extends Controller
 
     private function processFolderPath(?FileManager $parent)
     {
-        $folderPath = $parent?->file_path;
         $finalPath = null;
-        if (!empty($folderPath)) {
-            $segments = explode('/', $folderPath);
 
-            foreach ($segments as $key => &$segment) {
-                $fileManager = FileManager::where('name', 'LIKE', $segment)->where('user_id', $parent->user_id)->first();
+        if ($parent) {
+            $segments = [];
+            $currentFolder = $parent;
 
-                if ($key === 0) {
-                    $segment = null;
-                } elseif ($key === 1) {
-                    $segment = '<a href="#" class="show-children" data-id="'.$fileManager?->id.'">Tài liệu</a>';
+            while ($currentFolder) {
+                if ($currentFolder->parent) {
+                    $segments[] = '<a href="#" class="show-children" data-id="'.$currentFolder->id.'">'.$currentFolder->name.'</a>';
                 } else {
-                    $segment = '<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
-                        <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
-                    </span>'.'<a href="#" class="show-children" data-id="'.$fileManager?->id.'">'.$segment.'</a>';
+                    // If this is the last segment, set the name to "Tài liệu" and data-id to null
+                    $segments[] = '<a href="#" class="show-children" data-id="'.null.'">Tài liệu</a>';
                 }
 
+                // Move to the parent folder
+                $currentFolder = $currentFolder->parent;
             }
-            $finalPath = implode('', $segments);
+
+            // Reverse the array to get the correct order (from parent to child)
+            $segments = array_reverse($segments);
+
+            // Implode the segments to create the final path
+            $finalPath = implode('<span class="svg-icon svg-icon-2 svg-icon-primary mx-1">
+                        <img src="'.asset('assets/media/icons/duotune/arrows/arr071.svg').'" alt="">
+                    </span>', $segments);
         }
+
         return $finalPath;
     }
 

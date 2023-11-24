@@ -27,6 +27,8 @@ Route::middleware('web')->group(function () {
         Route::delete('/destroy', [AjaxController::class, 'destroy'])->name('ajax.destroy');
 
         Route::post('/update-permission', [AjaxController::class, 'permission'])->name('ajax.update-permission');
+        Route::get('/load-folder-remove', [AjaxController::class,'loadFolderRemove'])->name('ajax.load-folder-remove');
+        Route::patch('/move-file-to-folder', [AjaxController::class,'moveFile'])->name('ajax.move-file');
     });
 });
 

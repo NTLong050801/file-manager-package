@@ -99,6 +99,45 @@ class AjaxController extends Controller
 //        return view('file-manager::pages.file-manager.components.folder', compact('childrens'));
     }
 
+    public function loadFolderRemove(Request $request)
+    {
+        $fileId = $request->input('file_id');
+        $folderId = $request->input('folder_id');
+        $parent = $folderId ? FileManager::find($folderId) : FileManager::root();
+        $finalPath = $this->processFolderPath($parent);
+
+        $folders = $parent->children
+            ->whereNull('file_type')
+            ->where('is_trash', false)
+            ->reject(function ($folder) use ($fileId) {
+                return $folder->id == $fileId;
+            });
+
+        $file = FileManager::find($fileId);
+        $view = view('file-manager::pages.file-manager.components.content-modal-move-file', compact('folders', 'file', 'finalPath'))->render();
+
+        return response()->json([
+            'view' => $view
+        ]);
+    }
+
+    public function moveFile(Request $request)
+    {
+        $request->validate([
+            'file_id' => ['integer', 'required', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+            'folder_id' => ['nullable', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())]
+        ]);
+        try {
+            $file = FileManager::findOrFail($request->input('file_id'));
+            $folderId = $request->input('folder_id');
+            $parent = $folderId ? FileManager::find($folderId) : FileManager::root();
+            $this->processMoveFile($file, $parent);
+
+        } catch (\Exception $exception) {
+
+        }
+    }
+
     public function storeFolder(Request $request)
     {
         $request->validate([
@@ -221,15 +260,7 @@ class AjaxController extends Controller
                 $file = FileManager::findOrFail($id);
                 $root = FileManager::root();
                 if ($file->parent->is_direct_deleted) {
-                    $originalFilePath = $file->file_path;
-                    $destinationDirectory = $root->file_path;
-                    $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
-                    $destinationPath = $destinationDirectory.'/'.$filename;
-                    Storage::move($originalFilePath, $destinationPath);
-                    $file->update([
-                        'parent_id' => $root->id,
-                        'file_path' => $destinationPath,
-                    ]);
+                    $this->processMoveFile($file, $root);
                 }
                 $file->update([
                     'is_direct_deleted' => $request->input('is_direct_deleted'),
@@ -293,6 +324,20 @@ class AjaxController extends Controller
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
+    }
+
+    private function processMoveFile(FileManager $fileChildManager, FileManager $parentFileManager)
+    {
+        $originalFilePath = $fileChildManager->file_path;
+        $destinationDirectory = $parentFileManager->file_path;
+        $filename = pathinfo($originalFilePath, PATHINFO_BASENAME);
+        $destinationPath = $destinationDirectory.'/'.$filename;
+        Storage::move($originalFilePath, $destinationPath);
+        $fileChildManager->update([
+            'parent_id' => $parentFileManager->id,
+            'file_path' => $destinationPath,
+        ]);
+        $this->updateFilePathWhenRename($fileChildManager, $originalFilePath, $destinationPath);
     }
 
     private function updateIsTrash(FileManager $fileManager, $value)

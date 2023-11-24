@@ -54,7 +54,7 @@
                                         <label class="form-label mb-2" for="value">
                                             <span class="required">Tên thư mục</span>
                                         </label>
-                                        <input class="form-control" id="name_folder" placeholder="Nhập tên thư mục" name="name" required />
+                                        <input class="form-control" id="name_folder" placeholder="Nhập tên thư mục" name="name" required/>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -306,44 +306,18 @@
                     <!--begin::Modal body-->
                     <div class="modal-body pt-10 pb-15 px-lg-17">
                         <!--begin::Input group-->
-                        <div class="form-group fv-row fv-plugins-icon-container">
-                            <!--begin::Item-->
-                            <div class="d-flex">
-                                <!--begin::Checkbox-->
-                                <div class="form-check form-check-custom form-check-solid">
-                                    <!--begin::Input-->
-                                    <input class="form-check-input me-3" name="move_to_folder" type="radio" value="0" id="kt_modal_move_to_folder_0">
-                                    <!--end::Input-->
-                                    <!--begin::Label-->
-                                    <label class="form-check-label" for="kt_modal_move_to_folder_0">
-                                        <div class="fw-bold">
-                                            <!--begin::Svg Icon | path: icons/duotune/files/fil012.svg-->
-                                            <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-																			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-																				<path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
-																				<path
-                                                                                    d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z"
-                                                                                    fill="currentColor"></path>
-																			</svg>
-																		</span>
-                                            <!--end::Svg Icon-->account
-                                        </div>
-                                    </label>
-                                    <!--end::Label-->
-                                </div>
-                                <!--end::Checkbox-->
-                            </div>
-                            <!--end::Item-->
-                            <div class="fv-plugins-message-container invalid-feedback"></div>
+                        <div class="form-group fv-row fv-plugins-icon-container " id="content_modal_move_file">
+
                         </div>
                         <!--end::Input group-->
                         <!--begin::Action buttons-->
                         <div class="d-flex flex-center mt-12">
                             <!--begin::Button-->
                             <button type="button" class="btn btn-primary" id="kt_modal_move_to_folder_submit">
-                                <span class="indicator-label">Save</span>
+                                <span class="indicator-label">Lưu</span>
                                 <span class="indicator-progress">Please wait...
-																<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                </span>
                             </button>
                             <!--end::Button-->
                         </div>
@@ -387,73 +361,113 @@
         {{--let csrfToken = "{{ csrf_token() }}";--}}
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         let userId = {{auth()->id()}};
-        let rowId;
-        let tr;
+        let rowId, tr, folderId = null;
         let navItemType = "all-folder";
-        const initDropzone = () => {
-            // set the dropzone container id
-            const id = "#kt_modal_upload_dropzone";
-            const dropzone = document.querySelector(id);
 
-            var previewNode = dropzone.querySelector(".dropzone-item");
-            previewNode.id = "";
-            var previewTemplate = previewNode.parentNode.innerHTML;
-            previewNode.parentNode.removeChild(previewNode);
+        // set the dropzone container id
+        const id = "#kt_modal_upload_dropzone";
+        const dropzone = document.querySelector(id);
 
-            var myDropzone = new Dropzone(id, { // Make the whole body a dropzone
-                url: "{{route('ajax.upload-file')}}", // Set the url for your upload script location
-                parallelUploads: 5,
-                acceptedFiles: 'application/msword, text/csv, ' +
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, ' +
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document, ' +
-                    'application/pdf, application/vnd.ms-powerpoint, application/vnd.oasis.opendocument.text, ' +
-                    'application/vnd.oasis.opendocument.spreadsheet, ' +
-                    'application/vnd.oasis.opendocument.presentation, image/jpeg, ' +
-                    'image/png, image/jpg, image/gif',
-                dictInvalidFileType: "Loại tệp không hợp lệ. Vui lòng tải lên các tập tin thuộc loại .doc, .csv, .xlsx, .xls, .docx, .pdf, .ppt, .odt, .ods, .odp, .jpeg, .png, .jpg, .gif",
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                params: {
-                    parent_id: parentId,
-                },
-                previewTemplate: previewTemplate,
-                maxFilesize: 5, // Max filesize in MB
-                dictFileTooBig: "Tệp quá lớn. Kích thước tối đa là 5MB.",
-                autoProcessQueue: false, // Stop auto upload
-                autoQueue: false, // Make sure the files aren't queued until manually added
-                previewsContainer: id + " .dropzone-items", // Define the container to display the previews
-                clickable: id + " .dropzone-select", // Define the element that should be used as click trigger to select files.
-                init: function () {
-                    this.on("error", function (file, errorMessage, xhr) {
-                        var errorContainer = file.previewElement.querySelector('.dropzone-error');
+        var previewNode = dropzone.querySelector(".dropzone-item");
+        previewNode.id = "";
+        var previewTemplate = previewNode.parentNode.innerHTML;
+        previewNode.parentNode.removeChild(previewNode);
 
-                        // If the error container exists, update its content with the error message
-                        if (errorContainer) {
-                            errorContainer.innerText = errorMessage.message || errorMessage;
-                        }
-                    });
-                    this.on("addedfile", function (file) {
-                        if (this.files.length > this.options.parallelUploads) {
-                            showToast("Đã vượt quá số lượng tải lên song song tối đa.", null, 'error');
-                            this.removeFile(file); // Remove the exceeded file from the queue
-                        }
-                        const duplicateCount = this.files.reduce((count, f) => (f.name === file.name ? count + 1 : count), 0);
-                        if (duplicateCount > 1) {
-                            showToast("File đã tồn tại.", null, 'error');
-                            this.removeFile(file);
-                        }
-                    });
-                }
+        var myDropzone = new Dropzone(id, { // Make the whole body a dropzone
+            url: "{{route('ajax.upload-file')}}", // Set the url for your upload script location
+            parallelUploads: 5,
+            acceptedFiles: 'application/msword, text/csv, ' +
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, ' +
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document, ' +
+                'application/pdf, application/vnd.ms-powerpoint, application/vnd.oasis.opendocument.text, ' +
+                'application/vnd.oasis.opendocument.spreadsheet, ' +
+                'application/vnd.oasis.opendocument.presentation, image/jpeg, ' +
+                'image/png, image/jpg, image/gif',
+            dictInvalidFileType: "Loại tệp không hợp lệ. Vui lòng tải lên các tập tin thuộc loại .doc, .csv, .xlsx, .xls, .docx, .pdf, .ppt, .odt, .ods, .odp, .jpeg, .png, .jpg, .gif",
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },
+            params: {
+                parent_id: parentId,
+            },
+            previewTemplate: previewTemplate,
+            maxFilesize: 5, // Max filesize in MB
+            dictFileTooBig: "Tệp quá lớn. Kích thước tối đa là 5MB.",
+            autoProcessQueue: false, // Stop auto upload
+            autoQueue: false, // Make sure the files aren't queued until manually added
+            previewsContainer: id + " .dropzone-items", // Define the container to display the previews
+            clickable: id + " .dropzone-select", // Define the element that should be used as click trigger to select files.
+            init: function () {
+                this.on("error", function (file, errorMessage, xhr) {
+                    var errorContainer = file.previewElement.querySelector('.dropzone-error');
+
+                    // If the error container exists, update its content with the error message
+                    if (errorContainer) {
+                        errorContainer.innerText = errorMessage.message || errorMessage;
+                    }
+                });
+                this.on("addedfile", function (file) {
+                    if (this.files.length > this.options.parallelUploads) {
+                        showToast("Đã vượt quá số lượng tải lên song song tối đa.", null, 'error');
+                        this.removeFile(file); // Remove the exceeded file from the queue
+                    }
+                    const duplicateCount = this.files.reduce((count, f) => (f.name === file.name ? count + 1 : count), 0);
+                    if (duplicateCount > 1) {
+                        showToast("File đã tồn tại.", null, 'error');
+                        this.removeFile(file);
+                    }
+                });
+            }
+        });
+
+        myDropzone.on("addedfile", function (file) {
+            updateParentId(parentId);
+            // Hook each start button
+            file.previewElement.querySelector(id + " .dropzone-start").onclick = function () {
+                // myDropzone.enqueueFile(file);
+                myDropzone.processFile(file);
+                // Process simulation for demo only
+                const progressBar = file.previewElement.querySelector('.progress-bar');
+                progressBar.style.opacity = "1";
+                var width = 1;
+                var timer = setInterval(function () {
+                    if (width >= 100) {
+                        myDropzone.emit("success", file);
+                        myDropzone.emit("complete", file);
+                        clearInterval(timer);
+                    } else {
+                        width++;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 20);
+            };
+
+            const dropzoneItems = dropzone.querySelectorAll('.dropzone-item');
+            dropzoneItems.forEach(dropzoneItem => {
+                dropzoneItem.style.display = '';
             });
+            dropzone.querySelector('.dropzone-upload').style.display = "inline-block";
+            dropzone.querySelector('.dropzone-remove-all').style.display = "inline-block";
+        });
 
-            myDropzone.on("addedfile", function (file) {
-                updateParentId(parentId);
-                // Hook each start button
-                file.previewElement.querySelector(id + " .dropzone-start").onclick = function () {
-                    // myDropzone.enqueueFile(file);
-                    myDropzone.processFile(file);
-                    // Process simulation for demo only
+        // Hide the total progress bar when nothing's uploading anymore
+        myDropzone.on("complete", function (file) {
+            const progressBars = dropzone.querySelectorAll('.dz-complete');
+            setTimeout(function () {
+                progressBars.forEach(progressBar => {
+                    progressBar.querySelector('.progress-bar').style.opacity = "0";
+                    progressBar.querySelector('.progress').style.opacity = "0";
+                    progressBar.querySelector('.dropzone-start').style.opacity = "0";
+                });
+            }, 300);
+        });
+
+        // Setup the buttons for all transfers
+        dropzone.querySelector(".dropzone-upload").addEventListener('click', function () {
+            myDropzone.files.forEach(file => {
+                console.log(file)
+                if (file.status === 'added') {
+                    myDropzone.enqueueFile(file);
                     const progressBar = file.previewElement.querySelector('.progress-bar');
                     progressBar.style.opacity = "1";
                     var width = 1;
@@ -467,111 +481,70 @@
                             progressBar.style.width = width + '%';
                         }
                     }, 20);
-                };
-
-                const dropzoneItems = dropzone.querySelectorAll('.dropzone-item');
-                dropzoneItems.forEach(dropzoneItem => {
-                    dropzoneItem.style.display = '';
-                });
-                dropzone.querySelector('.dropzone-upload').style.display = "inline-block";
-                dropzone.querySelector('.dropzone-remove-all').style.display = "inline-block";
+                }
             });
+            myDropzone.processQueue();
+        });
 
-            // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("complete", function (file) {
-                const progressBars = dropzone.querySelectorAll('.dz-complete');
-                setTimeout(function () {
-                    progressBars.forEach(progressBar => {
-                        progressBar.querySelector('.progress-bar').style.opacity = "0";
-                        progressBar.querySelector('.progress').style.opacity = "0";
-                        progressBar.querySelector('.dropzone-start').style.opacity = "0";
-                    });
-                }, 300);
-            });
-
-            // Setup the buttons for all transfers
-            dropzone.querySelector(".dropzone-upload").addEventListener('click', function () {
-                myDropzone.files.forEach(file => {
-                    console.log(file)
-                    if (file.status === 'added') {
-                        myDropzone.enqueueFile(file);
-                        const progressBar = file.previewElement.querySelector('.progress-bar');
-                        progressBar.style.opacity = "1";
-                        var width = 1;
-                        var timer = setInterval(function () {
-                            if (width >= 100) {
-                                myDropzone.emit("success", file);
-                                myDropzone.emit("complete", file);
-                                clearInterval(timer);
-                            } else {
-                                width++;
-                                progressBar.style.width = width + '%';
-                            }
-                        }, 20);
-                    }
-                });
-                myDropzone.processQueue();
-            });
-
-            // Setup the button for remove all files
-            dropzone.querySelector(".dropzone-remove-all").addEventListener('click', function () {
-                Swal.fire({
-                    text: "Bạn có chắc chắn muốn xóa tất cả các tập tin?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    buttonsStyling: false,
-                    confirmButtonText: "OK, xoá!",
-                    cancelButtonText: "Không, Huỷ",
-                    customClass: {
-                        confirmButton: "btn btn-primary",
-                        cancelButton: "btn btn-danger"
-                    }
-                }).then(function (result) {
-                    if (result.value) {
-                        dropzone.querySelector('.dropzone-upload').style.display = "none";
-                        dropzone.querySelector('.dropzone-remove-all').style.display = "none";
-                        myDropzone.removeAllFiles(true);
-                    }
-                });
-            });
-
-            // On all files completed upload
-            myDropzone.on("queuecomplete", function (progress) {
-                const uploadIcons = dropzone.querySelectorAll('.dropzone-upload');
-                uploadIcons.forEach(uploadIcon => {
-                    uploadIcon.style.display = "none";
-                });
-
-            });
-
-            // On all files removed
-            myDropzone.on("removedfile", function (file) {
-                if (myDropzone.files.length < 1) {
+        // Setup the button for remove all files
+        dropzone.querySelector(".dropzone-remove-all").addEventListener('click', function () {
+            Swal.fire({
+                text: "Bạn có chắc chắn muốn xóa tất cả các tập tin?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "OK, xoá!",
+                cancelButtonText: "Không, Huỷ",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
                     dropzone.querySelector('.dropzone-upload').style.display = "none";
                     dropzone.querySelector('.dropzone-remove-all').style.display = "none";
+                    myDropzone.removeAllFiles(true);
                 }
             });
+        });
 
-            myDropzone.on("success", function (file, response) {
-                if (response) {
-                    showToast(response.message, null, 'success');
-                    loadFolder();
-                }
+        // On all files completed upload
+        myDropzone.on("queuecomplete", function (progress) {
+            const uploadIcons = dropzone.querySelectorAll('.dropzone-upload');
+            uploadIcons.forEach(uploadIcon => {
+                uploadIcon.style.display = "none";
             });
 
-            myDropzone.on("error", function (file, errorMessage, xhr) {
-                if (typeof errorMessage === 'object' && errorMessage.message) {
-                    showToast(errorMessage.message, null, 'error');
-                } else {
-                    showToast(errorMessage, null, 'error');
-                }
-            });
+        });
 
-            function updateParentId(newParentId) {
-                myDropzone.options.params.parent_id = newParentId;
+        // On all files removed
+        myDropzone.on("removedfile", function (file) {
+            if (myDropzone.files.length < 1) {
+                dropzone.querySelector('.dropzone-upload').style.display = "none";
+                dropzone.querySelector('.dropzone-remove-all').style.display = "none";
             }
+        });
+
+        myDropzone.on("success", function (file, response) {
+            if (response) {
+                showToast(response.message, null, 'success');
+                loadFolder();
+            }
+        });
+
+        myDropzone.on("error", function (file, errorMessage, xhr) {
+            if (typeof errorMessage === 'object' && errorMessage.message) {
+                showToast(errorMessage.message, null, 'error');
+            } else {
+                showToast(errorMessage, null, 'error');
+            }
+        });
+
+        function updateParentId(newParentId) {
+            myDropzone.options.params.parent_id = newParentId;
         }
-        initDropzone();
+
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': csrfToken
@@ -594,13 +567,20 @@
 
         $(document).on('click', '.show-children', function (e) {
             e.preventDefault();
-            parentId = $(this).data('id');
-            // navItemType = $(this).data('type');
-            loadFolder(parentId)
+            const clickedDiv = $(this).closest('div');
+            const divId = clickedDiv.attr('id');
+            if (divId === 'path_folder_move_modal') {
+                folderId = $(this).data('id');
+                loadFolderRemove()
+            }else{
+                parentId = $(this).data('id');
+                // navItemType = $(this).data('type');
+                loadFolder(parentId)
+            }
         })
 
         $('#type_folder').on('change', function () {
-
+            myDropzone.removeAllFiles();
             navItemType = $(this).val()
             if (navItemType === "deleted-folder" || navItemType === "share-folder") {
                 parentId = null;
@@ -799,8 +779,10 @@
             $('#show_image_modal').modal('show')
         })
 
-        $(document).on('click','.move-file',function () {
+        $(document).on('click', '.move-file', function () {
             $('.kt_modal_move_to_folder').modal('show')
+            folderId = null
+            loadFolderRemove();
         })
 
         $('#btn_delete_selected').on('click', function () {
@@ -870,6 +852,15 @@
             const listIds = getListIdsChecked().join('-');
             let downloadUrl = "/file-manager/download-multiple-files?ids=" + listIds;
             window.open(downloadUrl, '_blank');
+        })
+
+        $(document).on('click', '.folder-move',function () {
+            folderId = $(this).data('id');
+            loadFolderRemove();
+        })
+
+        $('#kt_modal_move_to_folder_submit').on('click', function () {
+            moveFileToFolder()
         })
         const showDeleteButton = () => {
             let countItemCheckbox = $("#table_data .checkbox-item-file:checked").length;
@@ -1004,6 +995,44 @@
             })
             return listIds;
         }
-        loadFolder()
+        const loadFolderRemove = () => {
+            $.ajax({
+                url: "{{route('ajax.load-folder-remove')}}",
+                method: "GET",
+                data: {
+                    'folder_id': folderId,
+                    'user_id': userId,
+                    'parent_id': parentId,
+                    'file_id' : rowId
+                },
+                success: function (response) {
+                    console.log(response)
+                    $('#content_modal_move_file').html(response.view)
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
+            })
+        }
+        const moveFileToFolder = () => {
+            $.ajax({
+                url: "{{route('ajax.move-file')}}",
+                method: "PATCH",
+                data: {
+                    'folder_id': folderId,
+                    'user_id': userId,
+                    'parent_id': parentId,
+                    'file_id' : rowId
+                },
+                success: function (response) {
+                    loadFolder()
+                    showToast("Xoá thành công", null, 'success')
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                }
+            })
+        }
+        loadFolder();
     })
 </script>

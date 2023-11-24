@@ -241,7 +241,8 @@
                             </div>
                             <!--end::Dropzone-->
                             <!--begin::Hint-->
-                            <span class="form-text fs-6 text-muted">Kích thước tệp tối đa là 5MB mỗi tệp, tối đa 5 tệp.</span>
+                            <span class="form-text fs-6 text-muted">Kích thước tệp tối đa là {{config('file-manager.capacity_max_file_upload
+')}}MB mỗi tệp, tối đa {{config('file-manager.number_file_upload_each')}} tệp.</span>
                         </div>
                         <!--end::Input group-->
                     </div>
@@ -375,7 +376,7 @@
 
         var myDropzone = new Dropzone(id, { // Make the whole body a dropzone
             url: "{{route('ajax.upload-file')}}", // Set the url for your upload script location
-            parallelUploads: 5,
+            parallelUploads: {{config('file-manager.number_file_upload_each')}},
             acceptedFiles: 'application/msword, text/csv, ' +
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, ' +
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document, ' +
@@ -391,8 +392,8 @@
                 parent_id: parentId,
             },
             previewTemplate: previewTemplate,
-            maxFilesize: 5, // Max filesize in MB
-            dictFileTooBig: "Tệp quá lớn. Kích thước tối đa là 5MB.",
+            maxFilesize: {{config('file-manager.capacity_max_file_upload')}}, // Max filesize in MB
+            dictFileTooBig: "Tệp quá lớn. Kích thước tối đa là {{config('file-manager.capacity_max_file_upload')}}MB.",
             autoProcessQueue: false, // Stop auto upload
             autoQueue: false, // Make sure the files aren't queued until manually added
             previewsContainer: id + " .dropzone-items", // Define the container to display the previews

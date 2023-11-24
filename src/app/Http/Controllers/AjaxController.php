@@ -101,6 +101,10 @@ class AjaxController extends Controller
 
     public function loadFolderRemove(Request $request)
     {
+        $request->validate([
+            'folder_id' => ['nullable', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
+            'file_id' => ['required','integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())]
+        ]);
         $fileId = $request->input('file_id');
         $folderId = $request->input('folder_id');
         $parent = $folderId ? FileManager::find($folderId) : FileManager::root();
@@ -209,8 +213,9 @@ class AjaxController extends Controller
 
     public function uploadFile(Request $request)
     {
+        $maxFileSize = config('file-manager.capacity_max_file_upload');
         $request->validate([
-            'file' => 'required|mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif|max:5120',
+            'file' => ['required','mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif',"max:$maxFileSize"],
         ]);
         try {
             if (empty($request->input('parent_id'))) {

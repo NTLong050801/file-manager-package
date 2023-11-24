@@ -19,5 +19,11 @@
                 "Ntlong050801\\FileManager\\FileManagerServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php artisan package:discover --ansi",
+            "@php artisan vendor:publish --tag=file-manager --force"
+        ]
     }
 }

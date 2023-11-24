@@ -15,6 +15,9 @@ class FileManagerServiceProvider extends ServiceProvider
             __DIR__.'/resources/views' => base_path('resources/views/'),
         ]);
         $this->publishes([
+            __DIR__ . '/config/file-manager.php' => config_path('file-manager.php'),
+        ], 'config');
+        $this->publishes([
             __DIR__.'/public/css' => public_path('vendor/file-manager/css'),
         ], 'css');
         $this->publishes([

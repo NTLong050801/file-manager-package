@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('memory')->default(1073741824); // 1 GB ;
+            $table->unsignedBigInteger('memory')->default(config('file-manager.memory_for_user')); // 1 GB ;
             $table->bigInteger('used_memory')->default(0);
         });
     }

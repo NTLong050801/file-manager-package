@@ -14,9 +14,10 @@ Run migrate:
 php artisan migrate
 ```
 
-Public 
+Public Css/ Js
 ```bash
-php artisan vendor:publish --tag=file-manager --force
+php artisan vendor:publish --tag=css --force
+php artisan vendor:publish --tag=js --force
 ```
 Make a blade example: 
 Route:

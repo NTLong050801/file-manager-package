@@ -214,7 +214,7 @@
     <tr class="odd">
         <td valign="top" colspan="12" class="dataTables_empty">
             <div class="d-flex flex-column flex-center">
-                <img src="{{asset('vendor/file-manager/images/not-found-item.svg')}}" class="mw-400px">
+                <img src="{{asset('vendor/file-manager/images/fil018.svg')}}" class="mw-400px">
                 <div class="fs-1 fw-bolder text-dark">Không tìm thấy.</div>
                 <div class="fs-6">Bắt đầu tạo thư mục mới hoặc tải lên tệp mới!</div>
             </div>

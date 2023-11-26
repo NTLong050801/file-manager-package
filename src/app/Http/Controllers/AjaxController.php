@@ -213,7 +213,7 @@ class AjaxController extends Controller
 
     public function uploadFile(Request $request)
     {
-        $maxFileSize = config('file-manager.capacity_max_file_upload');
+        $maxFileSize = config('file-manager.capacity_max_file_upload')*1024;
         $request->validate([
             'file' => ['required','mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif',"max:$maxFileSize"],
         ]);

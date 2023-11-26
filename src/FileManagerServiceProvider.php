@@ -18,7 +18,7 @@ class FileManagerServiceProvider extends ServiceProvider
             __DIR__.'/public/css' => public_path('vendor/file-manager/css'),
             __DIR__.'/public/js' => public_path('vendor/file-manager/js'),
             __DIR__.'/public/icons' => public_path('vendor/file-manager/icons'),
-            __DIR__ . '/public/images' => public_path('vendor/file-manager/image'),
+            __DIR__ . '/public/images' => public_path('vendor/file-manager/images'),
         ], 'file-manager');
     }
 

@@ -35,25 +35,25 @@
                             @switch($child->file_type)
                                 @case('doc')
                                 @case('docx')
-                                    <img src="{{asset('vendor/file-manager/image/word.svg')}}" width="35" height="30" alt="">
+                                    <img src="{{asset('vendor/file-manager/images/word.svg')}}" width="35" height="30" alt="">
                                     @break
                                 @case('xlsx')
                                 @case('xls')
-                                    <img src="{{asset('vendor/file-manager/image/excel.svg')}}" width="35" height="30" alt="">
+                                    <img src="{{asset('vendor/file-manager/images/excel.svg')}}" width="35" height="30" alt="">
                                     @break
                                 @case('pdf')
-                                    <img src="{{asset('vendor/file-manager/image/pdf.svg')}}" width="35" height="30" alt="">
+                                    <img src="{{asset('vendor/file-manager/images/pdf.svg')}}" width="35" height="30" alt="">
                                     @break
                                 @case('jpeg')
                                 @case('png')
                                 @case('jpg')
                                 @case('gif')
-                                    <img src="{{asset('vendor/file-manager/image/image_thumb.svg')}}" width="35" height="30" alt="">
+                                    <img src="{{asset('vendor/file-manager/images/image_thumb.svg')}}" width="35" height="30" alt="">
                                     @break
                                 @default
                                     <!--begin::Svg Icon | path: icons/duotune/files/fil003.svg-->
                                     <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-                                    <img src="{{asset('assets/media/icons/duotune/files/fil003.svg')}}" alt="">
+                                    <img src="{{asset('vendor/file-manager/icons/fil003.svg')}}" alt="">
                                 </span>
                                     <!--end::Svg Icon-->
                                     @break
@@ -108,7 +108,7 @@
                                         <div class="position-relative">
                                             <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
                                             <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
-                                            <img src="{{asset('assets/media/icons/duotune/general/gen021.svg')}}" alt="">
+                                            <img src="{{asset('vendor/file-manager/icons/gen021.svg')}}" alt="">
                                         </span>
                                             <!--end::Svg Icon-->
                                             <input type="text" class="form-control-sm ps-10 border-black rounded-pill w-300px input_keyword" name="keyword" placeholder="Tên người dùng"
@@ -163,7 +163,7 @@
                                     data-kt-menu-placement="bottom-end">
                                 <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
                                 <span class="svg-icon svg-icon-5 m-0">
-                                    <img src="{{asset('assets/media/icons/duotune/general/gen052.svg')}}" alt="">
+                                    <img src="{{asset('vendor/file-manager/icons/gen052.svg')}}" alt="">
                                 </span>
                                 <!--end::Svg Icon-->
                             </button>
@@ -214,11 +214,11 @@
     <tr class="odd">
         <td valign="top" colspan="12" class="dataTables_empty">
             <div class="d-flex flex-column flex-center">
-                <img src="{{asset('assets/media/illustrations/sketchy-1/5.png')}}" class="mw-400px">
+                <img src="{{asset('vendor/file-manager/images/fil018.svg')}}" class="mw-400px">
                 <div class="fs-1 fw-bolder text-dark">Không tìm thấy.</div>
                 <div class="fs-6">Bắt đầu tạo thư mục mới hoặc tải lên tệp mới!</div>
             </div>
-        </td>
+        </td>x
     </tr>
 @endif
 

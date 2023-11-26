@@ -22,20 +22,20 @@
                 @switch($file->file_type)
                     @case('doc')
                     @case('docx')
-                        <img src="{{asset('vendor/file-manager/image/word.svg')}}" width="35" height="30" alt="">
+                        <img src="{{asset('vendor/file-manager/images/word.svg')}}" width="35" height="30" alt="">
                         @break
                     @case('xlsx')
                     @case('xls')
-                        <img src="{{asset('vendor/file-manager/image/excel.svg')}}" width="35" height="30" alt="">
+                        <img src="{{asset('vendor/file-manager/images/excel.svg')}}" width="35" height="30" alt="">
                         @break
                     @case('pdf')
-                        <img src="{{asset('vendor/file-manager/image/pdf.svg')}}" width="35" height="30" alt="">
+                        <img src="{{asset('vendor/file-manager/images/pdf.svg')}}" width="35" height="30" alt="">
                         @break
                     @case('jpeg')
                     @case('png')
                     @case('jpg')
                     @case('gif')
-                        <img src="{{asset('vendor/file-manager/image/image_thumb.svg')}}" width="35" height="30" alt="">
+                        <img src="{{asset('vendor/file-manager/images/image_thumb.svg')}}" width="35" height="30" alt="">
                         @break
                     @case(null)
                         <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
@@ -50,7 +50,7 @@
                     @default
                         <!--begin::Svg Icon | path: icons/duotune/files/fil003.svg-->
                         <span class="svg-icon svg-icon-2x svg-icon-primary me-4">
-                                    <img src="{{asset('assets/media/icons/duotune/files/fil003.svg')}}" alt="">
+                                    <img src="{{asset('vendor/file-manager/icons/fil003.svg')}}" alt="">
                                 </span>
                         <!--end::Svg Icon-->
                         @break
@@ -78,7 +78,7 @@
                         <path opacity="0.3" d="M10 4H21C21.6 4 22 4.4 22 5V7H10V4Z" fill="currentColor"></path>
                         <path
                             d="M9.2 3H3C2.4 3 2 3.4 2 4V19C2 19.6 2.4 20 3 20H21C21.6 20 22 19.6 22 19V7C22 6.4 21.6 6 21 6H12L10.4 3.60001C10.2 3.20001 9.7 3 9.2 3Z"
-                                                                                    fill="currentColor"></path>
+                            fill="currentColor"></path>
                     </svg>
                 </span>
                 <!--end::Svg Icon-->{{$folder->name}}

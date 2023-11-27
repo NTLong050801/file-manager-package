@@ -32,7 +32,7 @@ return new class extends Migration
 
             // Lưu thông tin thư mục gốc vào cơ sở dữ liệu
             FileManager::create([
-                'name' => $user->name . "'s Document",
+                'name' => ($user->name ?? $user->username) . "'s Document",
                 'file_path' => $rootPath,
                 'user_id' => $user->id,
             ]);

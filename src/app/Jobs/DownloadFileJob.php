@@ -45,7 +45,7 @@ class DownloadFileJob implements ShouldQueue
 
             $files = $this->fileManager->getPathFileIsTrash($this->fileManager,$this->userId, $this->isTrash, $this->isShare);
 
-            $pathZip = storage_path('app/'.$this->fileManager->name.'.zip');
+            $pathZip = storage_path('app/File-manager/'.$this->fileManager->name.'.zip');
             if ($zip->open($pathZip, ZipArchive::CREATE) === true) {
                 foreach ($files as $file) {
                     $zip->addFile(storage_path('app/'.$file), str_replace($path.'/', '', $file));

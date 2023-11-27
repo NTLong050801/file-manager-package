@@ -1,6 +1,7 @@
 <head>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;500;700">
     <!--end::Fonts-->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
     <link href="{{asset('vendor/file-manager/css/plugins.bundle.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('vendor/file-manager/css/style.bundle.css')}}" rel="stylesheet" type="text/css">

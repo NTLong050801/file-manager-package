@@ -38,7 +38,7 @@ class FileManagerController extends Controller
         $isShare = $type === FileManager::TYPE_SHARE_FOLDER;
         if (Storage::exists($path)) {
             if (empty($file->file_type)) {
-                $pathZip = storage_path('app/'.$file->name.'.zip');
+                $pathZip = storage_path('app/File-manager/'.$file->name.'.zip');
                 if (Storage::exists($pathZip)) {
                     Storage::delete($pathZip);
                 }
@@ -71,7 +71,7 @@ class FileManagerController extends Controller
                 'ids.*' => ['integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
             ]);
             $fileParent = FileManager::find($ids[0])->parent;
-            $pathZip = storage_path('app/'.$fileParent->name.'.zip');
+            $pathZip = storage_path('app/File-manager/'.$fileParent->name.'.zip');
             if (Storage::exists($pathZip)) {
                 Storage::delete($pathZip);
             }

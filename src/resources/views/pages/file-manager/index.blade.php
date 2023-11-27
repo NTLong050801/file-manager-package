@@ -1027,7 +1027,7 @@
                 },
                 success: function (response) {
                     loadFolder()
-                    showToast("Xoá thành công", null, 'success')
+                    showToast("Chuyển thành công ", null, 'success')
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

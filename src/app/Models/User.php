@@ -40,4 +40,10 @@ class User extends \App\Models\User
     {
         return $this->hasMany(FileManager::class, 'user_id');
     }
+
+    public function getTotalFileSize()
+    {
+        return $this->file()->sum('file_size');
+    }
+    
 }

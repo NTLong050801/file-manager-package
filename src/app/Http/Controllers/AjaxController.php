@@ -4,6 +4,7 @@ namespace Ntlong050801\FileManager\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -103,7 +104,7 @@ class AjaxController extends Controller
     {
         $request->validate([
             'folder_id' => ['nullable', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())],
-            'file_id' => ['required','integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())]
+            'file_id' => ['required', 'integer', Rule::in(User::find(auth()->id())->file->pluck('id')->toArray())]
         ]);
         $fileId = $request->input('file_id');
         $folderId = $request->input('folder_id');
@@ -213,9 +214,9 @@ class AjaxController extends Controller
 
     public function uploadFile(Request $request)
     {
-        $maxFileSize = config('file-manager.capacity_max_file_upload')*1024;
+        $maxFileSize = config('file-manager.capacity_max_file_upload') * 1024;
         $request->validate([
-            'file' => ['required','mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif',"max:$maxFileSize"],
+            'file' => ['required', 'mimes:doc,csv,xlsx,xls,docx,pdf,ppt,odt,ods,odp,jpeg,png,jpg,gif', "max:$maxFileSize"],
         ]);
         try {
             if (empty($request->input('parent_id'))) {
@@ -233,6 +234,10 @@ class AjaxController extends Controller
             if ($fileCount >= 1) {
                 return response()->json(['message' => "Đã tồn tại tên này trong thư mục"], 422);
             }
+            $checkMemory = $this->checkMemory($fileSize);
+            if (!$checkMemory){
+                return response()->json(['message' => "Không đủ bộ nhớ để upload file"], 422);
+            }
             Storage::putFileAs($path, $file, $originalName);
             // For example, assuming you have a FileManager model:
             FileManager::create([
@@ -243,6 +248,7 @@ class AjaxController extends Controller
                 'parent_id' => $parentId,
                 'user_id' => auth()->id(),
             ]);
+            $this->updateMemoryUsed();
             return response()->json(['message' => 'Upload file thành công']);
         } catch (\Exception $exception) {
             return $exception->getMessage();
@@ -320,6 +326,7 @@ class AjaxController extends Controller
                 }
                 $file->delete();
             }
+            $this->updateMemoryUsed();
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }
@@ -456,5 +463,28 @@ class AjaxController extends Controller
     {
         $files = FileManager::where('parent_id', $parentId)->where('name', 'LIKE', $name)->get();
         return $files->count();
+    }
+
+    private function checkMemory(int $fileSize):bool
+    {
+        $user = Auth::user();
+        // Tổng bộ nhớ đã sử dụng và bộ nhớ tối đa được phép
+        $usedMemory = $user->used_memory;
+        $maxMemory = $user->memory;
+
+        $newMemoryUsage = $usedMemory + $fileSize;
+
+        if ($newMemoryUsage <= $maxMemory) {
+            return true;
+        }
+        return false;
+    }
+
+    private function updateMemoryUsed(){
+        $user = User::find(auth()->id());
+        $totalMemory = $user->getTotalFileSize();
+        $user->update([
+           'used_memory' => $totalMemory,
+        ]);
     }
 }

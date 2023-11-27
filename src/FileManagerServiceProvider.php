@@ -8,7 +8,6 @@ class FileManagerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
             $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
             $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
             $this->loadViewsFrom(__DIR__ . '/resources/views', 'file-manager');
@@ -21,7 +20,6 @@ class FileManagerServiceProvider extends ServiceProvider
                 __DIR__ . '/public/icons' => public_path('vendor/file-manager/icons'),
                 __DIR__ . '/public/images' => public_path('vendor/file-manager/images'),
             ], 'file-manager');
-        }
     }
 
     public function register()

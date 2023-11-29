@@ -79,13 +79,9 @@
                 @if($child->user_id == $userId && !$child->is_trash)
                     {{--                    <button class="btn btn-sm btn-primary rounded-5 add-permission" data-bs-toggle="modal" data-bs-target="#permission_modal_{{$children->id}}"><i class="fa-solid fa-user-plus"></i></button>--}}
                     <div class="d-flex">
-                        @foreach($child->users->take(3) as $userFile)
-                            <div>
-                                <img src="{{$userFile->avatar}}" width="30" height="30" class="rounded-circle" alt=""
-                                     data-bs-toggle="tooltip" data-bs-placement="top" title="{{$userFile->name}}"
-                                >
-                            </div>
-                        @endforeach
+                        <div class="permission-users d-flex">
+                            @include('file-manager::pages.file-manager.components.permissons-with-users',['users' => $child->users])
+                        </div>
                         <a href="#" class="d-flex justify-content-center align-items-center bg-secondary rounded-circle ms-1 add-permission w-30px h-30px" data-bs-toggle="modal"
                            data-bs-target="#permission_modal_{{$child->id}}" data-bs-placement="top" title="Thêm quyền">
                             <svg class=" svg-inline--fa fa-plus fa-w-14" aria-hidden="true" data-prefix="fa" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +214,8 @@
                 <div class="fs-1 fw-bolder text-dark">Không tìm thấy.</div>
                 <div class="fs-6">Bắt đầu tạo thư mục mới hoặc tải lên tệp mới!</div>
             </div>
-        </td>x
+        </td>
+        x
     </tr>
 @endif
 

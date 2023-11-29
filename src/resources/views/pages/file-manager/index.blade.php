@@ -762,6 +762,7 @@
                 },
                 success: function (response) {
                     showToast('Thành công', 'Đã cập nhật thành công', 'success');
+                    tr.find('.permission-users').html(response.view_permission_user);
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

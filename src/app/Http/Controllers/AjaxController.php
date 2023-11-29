@@ -354,6 +354,10 @@ class AjaxController extends Controller
                 $file->users()->detach($user);
             }
             $this->updatePermission($file, $user, $isActive);
+            $view = view('file-manager::pages.file-manager.components.permissons-with-users', ['users' => $file->users])->render();
+            return response()->json([
+                'view_permission_user' => $view,
+            ]);
         } catch (\Exception $exception) {
             return $exception->getMessage();
         }

@@ -150,13 +150,12 @@
                 @endif
             </td>
             <!--begin::Actions-->
-            <td class="text-end" data-kt-filemanager-table="action_dropdown" style="position: relative">
+            <td class="text-end" data-kt-filemanager-table="action_dropdown">
                 @if($child->user_id == $userId)
                     <div class="d-flex justify-content-end">
                         <!--begin::More-->
-                        <div class="ms-2 more" data-id="{{$child->id}}" style="position: relative">
-                            <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click"
-                                    data-kt-menu-placement="bottom-end">
+                        <div class="ms-2 more" data-id="{{$child->id}}">
+                            <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary me-2 menu-toggle" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                 <!--begin::Svg Icon | path: icons/duotune/general/gen052.svg-->
                                 <span class="svg-icon svg-icon-5 m-0">
                                     <img src="{{asset('vendor/file-manager/icons/gen052.svg')}}" alt="">

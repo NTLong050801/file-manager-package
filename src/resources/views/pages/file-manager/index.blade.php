@@ -234,7 +234,7 @@
                                         <div class="dropzone-toolbar">
                                             <span class="dropzone-start me-3">
                                                 <i class="fa-solid fa-upload fs-2x icon-upload-file" style="color: #55c35d;"
-                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Upload file"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Tải lên"
                                                 ></i>
                                             </span>
                                             <span class="dropzone-cancel" data-dz-remove="" style="display: none;">
@@ -612,21 +612,6 @@
             // Find the closest ancestor with the class 'ms-2' (or adjust the selector accordingly)
             tr = $(this).closest('tr');
             rowId = tr.data('id');
-
-            if ($(this).hasClass('menu-toggle')) {
-                const closest = $(this).closest('.more');
-                const targetMenu = closest.find('.menu');
-
-                $('.menu-sub-dropdown').not(targetMenu).removeClass('show');
-                if (targetMenu.hasClass('menu-sub-dropdown')) {
-                    targetMenu.toggleClass('show');
-                    targetMenu.css({
-                        position: 'absolute',
-                        top: $(this).outerHeight() + 'px',
-                        right: '50px',
-                    })
-                }
-            }
             event.stopPropagation();
         });
         $(document).on('click', function (event) {
@@ -917,7 +902,6 @@
             });
         }
         const loadFolder = (showPageLoading = true) => {
-            console.log(showPageLoading)
             if (showPageLoading) {
                 KTApp.showPageLoading();
             }
@@ -935,6 +919,7 @@
                     $('#count_item').html(response.count_children.toString() + ' items')
                     // $('[data-bs-toggle="tooltip"]').tooltip();
                     showDeleteButton();
+                    KTMenu.createInstances();
                     if (showPageLoading) {
                         KTApp.hidePageLoading();
                     }
@@ -973,9 +958,9 @@
                 processData: false,
                 contentType: false,
                 success: function () {
-                    if (isDelete){
+                    if (isDelete) {
                         showToast("Xoá thành công", null, 'success')
-                    }else{
+                    } else {
                         showToast("Khôi phục thành công", null, 'success')
                     }
                     loadFolder()

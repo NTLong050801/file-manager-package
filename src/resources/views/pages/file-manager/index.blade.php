@@ -557,6 +557,9 @@
             myDropzone.options.params.parent_id = newParentId;
         }
 
+        $('#btn_show_modal_upload_file').on('click',function () {
+            myDropzone.removeAllFiles(true);
+        })
 
         $.ajaxSetup({
             headers: {

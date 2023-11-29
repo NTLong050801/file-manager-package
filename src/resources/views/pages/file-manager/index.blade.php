@@ -706,7 +706,7 @@
                     formData.append('value', 0);
                     formData.append('is_direct_deleted', 0);
                     formData.append('_method', 'PATCH');
-                    putTrashFolder(formData)
+                    putTrashFolder(formData,false)
                 }
             });
         })
@@ -844,7 +844,7 @@
                         formData.append('value', 0);
                         formData.append('is_direct_deleted', 0);
                         formData.append('_method', 'PATCH');
-                        putTrashFolder(formData)
+                        putTrashFolder(formData,false)
 
                     }
                 });
@@ -961,7 +961,7 @@
                 }
             });
         }
-        const putTrashFolder = (formData) => {
+        const putTrashFolder = (formData, isDelete = true) => {
             $.ajax({
                 url: '{{route('ajax.put-file-trash')}}',
                 type: 'POST',
@@ -969,8 +969,12 @@
                 processData: false,
                 contentType: false,
                 success: function () {
+                    if (isDelete){
+                        showToast("Xoá thành công", null, 'success')
+                    }else{
+                        showToast("Khôi phục thành công", null, 'success')
+                    }
                     loadFolder()
-                    showToast("Xoá thành công", null, 'success')
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
@@ -1034,6 +1038,7 @@
                 success: function (response) {
                     loadFolder()
                     showToast("Chuyển thành công ", null, 'success')
+                    $('.modal').modal('hide')
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')

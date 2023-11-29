@@ -74,7 +74,7 @@
                     </div>
                     <!--end::Export-->
                     <!--begin::Add customer-->
-                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_upload">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_upload" id="btn_show_modal_upload_file">
                         <!--begin::Svg Icon | path: icons/duotune/files/fil018.svg-->
                         <span class="svg-icon svg-icon-2">
                                 <img src="{{asset('vendor/file-manager/icons/fil018.svg')}}" alt="">
@@ -432,27 +432,20 @@
                 });
             }
         });
-
+        //Click add a file
         myDropzone.on("addedfile", function (file) {
             updateParentId(parentId);
             // Hook each start button
-            file.previewElement.querySelector(id + " .dropzone-start").onclick = function () {
-                // myDropzone.enqueueFile(file);
-                myDropzone.processFile(file);
-                // Process simulation for demo only
-                const progressBar = file.previewElement.querySelector('.progress-bar');
-                progressBar.style.opacity = "1";
-                var width = 1;
-                var timer = setInterval(function () {
-                    if (width >= 100) {
-                        myDropzone.emit("success", file);
-                        myDropzone.emit("complete", file);
-                        clearInterval(timer);
-                    } else {
-                        width++;
-                        progressBar.style.width = width + '%';
-                    }
-                }, 20);
+            const startButton = file.previewElement.querySelector(id + " .dropzone-start");
+            const progressBar = file.previewElement.querySelector('.progress-bar');
+
+            startButton.onclick = function () {
+                if (file.status === 'added') {
+                    myDropzone.processFile(file)
+                }
+                myDropzone.on("uploadprogress", function (file, progress, bytesSent) {
+                    progressBar.style.width = progress + '%';
+                });
             };
 
             const dropzoneItems = dropzone.querySelectorAll('.dropzone-item');
@@ -463,41 +456,50 @@
             dropzone.querySelector('.dropzone-remove-all').style.display = "inline-block";
         });
 
-        // Hide the total progress bar when nothing's uploading anymore
-        myDropzone.on("complete", function (file) {
-            const progressBars = dropzone.querySelectorAll('.dz-complete');
-            setTimeout(function () {
-                progressBars.forEach(progressBar => {
-                    progressBar.querySelector('.progress-bar').style.opacity = "0";
-                    progressBar.querySelector('.progress').style.opacity = "0";
-                    progressBar.querySelector('.dropzone-start').style.opacity = "0";
-                });
-            }, 300);
+        myDropzone.on("success", function (file, response) {
+            if (response) {
+                showToast(response.message, null, 'success');
+            }
         });
 
         // Setup the buttons for all transfers
         dropzone.querySelector(".dropzone-upload").addEventListener('click', function () {
             myDropzone.files.forEach(file => {
-                console.log(file)
                 if (file.status === 'added') {
                     myDropzone.enqueueFile(file);
-                    const progressBar = file.previewElement.querySelector('.progress-bar');
-                    progressBar.style.opacity = "1";
-                    var width = 1;
-                    var timer = setInterval(function () {
-                        if (width >= 100) {
-                            myDropzone.emit("success", file);
-                            myDropzone.emit("complete", file);
-                            clearInterval(timer);
-                        } else {
-                            width++;
-                            progressBar.style.width = width + '%';
-                        }
-                    }, 20);
                 }
             });
             myDropzone.processQueue();
+            myDropzone.on("uploadprogress", function (file, progress, bytesSent) {
+                const progressBar = file.previewElement.querySelector('.progress-bar');
+                progressBar.style.width = progress + '%';
+            });
         });
+
+        // Listen for the queuecomplete event
+        myDropzone.on("queuecomplete", function (progress) {
+            const uploadIcons = dropzone.querySelectorAll('.dropzone-upload');
+            uploadIcons.forEach(uploadIcon => {
+                uploadIcon.style.display = "none";
+            });
+        });
+
+        // Event listener for complete event
+        myDropzone.on("complete", function (file) {
+            myDropzone.off("uploadprogress");
+            if (myDropzone.getQueuedFiles().length === 0 && myDropzone.getUploadingFiles().length === 0) {
+               loadFolder(false);
+            }
+            const progressBars = dropzone.querySelectorAll('.dz-complete');
+            setTimeout(function () {
+                progressBars.forEach(progressBar => {
+                    progressBar.querySelector('.progress-bar').style.display = "none";
+                    progressBar.querySelector('.progress').style.display = "none";
+                    progressBar.querySelector('.dropzone-start').style.display = "none";
+                });
+            }, 300);
+        });
+
 
         // Setup the button for remove all files
         dropzone.querySelector(".dropzone-remove-all").addEventListener('click', function () {
@@ -521,27 +523,11 @@
             });
         });
 
-        // On all files completed upload
-        myDropzone.on("queuecomplete", function (progress) {
-            const uploadIcons = dropzone.querySelectorAll('.dropzone-upload');
-            uploadIcons.forEach(uploadIcon => {
-                uploadIcon.style.display = "none";
-            });
-
-        });
-
         // On all files removed
         myDropzone.on("removedfile", function (file) {
             if (myDropzone.files.length < 1) {
                 dropzone.querySelector('.dropzone-upload').style.display = "none";
                 dropzone.querySelector('.dropzone-remove-all').style.display = "none";
-            }
-        });
-
-        myDropzone.on("success", function (file, response) {
-            if (response) {
-                showToast(response.message, null, 'success');
-                loadFolder();
             }
         });
 
@@ -588,7 +574,7 @@
             if (divId === 'path_folder_move_modal') {
                 folderId = $(this).data('id');
                 loadFolderRemove()
-            }else{
+            } else {
                 parentId = $(this).data('id');
                 // navItemType = $(this).data('type');
                 loadFolder(parentId)
@@ -870,7 +856,7 @@
             window.open(downloadUrl, '_blank');
         })
 
-        $(document).on('click', '.folder-move',function () {
+        $(document).on('click', '.folder-move', function () {
             folderId = $(this).data('id');
             loadFolderRemove();
         })
@@ -926,8 +912,11 @@
                 }
             });
         }
-        const loadFolder = () => {
-            KTApp.showPageLoading();
+        const loadFolder = (showPageLoading = true) => {
+            console.log(showPageLoading)
+            if (showPageLoading) {
+                KTApp.showPageLoading();
+            }
             $.ajax({
                 url: "/ajax/children",
                 method: "GET",
@@ -942,12 +931,15 @@
                     $('#count_item').html(response.count_children.toString() + ' items')
                     // $('[data-bs-toggle="tooltip"]').tooltip();
                     showDeleteButton();
-                    KTApp.hidePageLoading();
-
+                    if (showPageLoading) {
+                        KTApp.hidePageLoading();
+                    }
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
-                    KTApp.hidePageLoading();
+                    if (showPageLoading) {
+                        KTApp.hidePageLoading();
+                    }
                 }
             })
         }
@@ -1019,10 +1011,9 @@
                     'folder_id': folderId,
                     'user_id': userId,
                     'parent_id': parentId,
-                    'file_id' : rowId
+                    'file_id': rowId
                 },
                 success: function (response) {
-                    console.log(response)
                     $('#content_modal_move_file').html(response.view)
                 },
                 error: function (xhr, status, error) {
@@ -1038,7 +1029,7 @@
                     'folder_id': folderId,
                     'user_id': userId,
                     'parent_id': parentId,
-                    'file_id' : rowId
+                    'file_id': rowId
                 },
                 success: function (response) {
                     loadFolder()

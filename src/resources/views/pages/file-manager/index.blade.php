@@ -1,14 +1,21 @@
 <head>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;500;700">
+    {{--    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;500;700">--}}
     <!--end::Fonts-->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    {{--    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">--}}
     <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
     <link href="{{asset('vendor/file-manager/css/plugins.bundle.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('vendor/file-manager/css/style.bundle.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('vendor/file-manager/css/datatables.bundle.css')}}" rel="stylesheet" type="text/css"/>
     {{--    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />--}}
 </head>
-<div id="kt_app_content_container" class="app-container container-xxl">
+<div class="app-container">
+    <div class="card card-flush bgi-position-y-center bgi-no-repeat mb-10">
+        <div class="card-header">
+            <div class="card-title">
+                <h2>Quản lí tài liệu</h2>
+            </div>
+        </div>
+    </div>
     <!--begin::Card-->
     <div class="card card-flush">
         <!--begin::Card header-->
@@ -198,9 +205,9 @@
                             <div class="dropzone dropzone-queue mb-2" id="kt_modal_upload_dropzone">
                                 <!--begin::Controls-->
                                 <div class="dropzone-panel mb-4">
-                                    <a class="dropzone-select btn btn-sm btn-primary me-2">Đính kèm tập tin</a>
+                                    <a class="dropzone-select btn btn-sm btn-primary me-2">Chọn tập tin</a>
                                     <a class="dropzone-upload btn btn-sm btn-light-primary me-2">Tải tất cả</a>
-                                    <a class="dropzone-remove-all btn btn-sm btn-light-primary">Xoá tất cả</a>
+                                    <a class="dropzone-remove-all btn btn-sm btn-light-danger">Xoá tất cả</a>
                                 </div>
                                 <!--end::Controls-->
                                 <!--begin::Items-->
@@ -225,8 +232,10 @@
                                         <!--end::Progress-->
                                         <!--begin::Toolbar-->
                                         <div class="dropzone-toolbar">
-                                            <span class="dropzone-start">
-                                                <i class="bi bi-play-fill fs-3"></i>
+                                            <span class="dropzone-start me-3">
+                                                <i class="fa-solid fa-upload fs-2x icon-upload-file" style="color: #55c35d;"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Upload file"
+                                                ></i>
                                             </span>
                                             <span class="dropzone-cancel" data-dz-remove="" style="display: none;">
                                                 <i class="bi bi-x fs-3"></i>
@@ -242,8 +251,7 @@
                             </div>
                             <!--end::Dropzone-->
                             <!--begin::Hint-->
-                            <span class="form-text fs-6 text-muted">Kích thước tệp tối đa là {{config('file-manager.capacity_max_file_upload
-')}}MB mỗi tệp, tối đa {{config('file-manager.number_file_upload_each')}} tệp.</span>
+                            <span class="form-text fs-6 text-muted">Kích thước tệp tối đa là {{config('file-manager.capacity_max_file_upload')}}MB mỗi tệp, tối đa {{config('file-manager.number_file_upload_each')}} tệp.</span>
                         </div>
                         <!--end::Input group-->
                     </div>
@@ -418,6 +426,9 @@
                         showToast("File đã tồn tại.", null, 'error');
                         this.removeFile(file);
                     }
+                    $('.icon-upload-file').tooltip({
+                        trigger: 'hover'
+                    });
                 });
             }
         });

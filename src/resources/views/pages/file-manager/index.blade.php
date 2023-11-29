@@ -862,6 +862,9 @@
             loadFolderRemove();
         })
 
+        $(document).on('click', '.btn-show-permission-user', function () {
+            $(this).closest('td').find('.modal-permission').modal('show')
+        })
         $('#kt_modal_move_to_folder_submit').on('click', function () {
             moveFileToFolder()
         })

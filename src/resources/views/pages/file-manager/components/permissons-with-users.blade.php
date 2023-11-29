@@ -1,14 +1,15 @@
-@foreach($users as $key => $userPermission)
-    @if($key < 2)
-        <div>
-            <img src="{{$userPermission->avatar}}" width="30" height="30" class="rounded-circle" alt=""
-                 data-bs-toggle="tooltip" data-bs-placement="top" title="{{$userPermission->name}}"
-            >
-        </div>
-    @else
-        <div class="rounded-circle overflow-hidden bg-primary text-white" style="width: 30px; height: 30px; line-height: 30px; text-align: center; position: relative;">
-            +{{ $users->count()-2 }}
-        </div>
-        @break
-    @endif
-@endforeach
+<div class="symbol-group symbol-hover">
+    @foreach($users as $key => $userPermission)
+        @if($key < 2)
+            <div class="symbol symbol-30px symbol-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="{{$userPermission->name}}">
+                <div class="symbol-label" style="background-image:url({{$userPermission->avatar}})"></div>
+            </div>
+        @else
+            <div class="symbol symbol-circle symbol-30px btn-show-permission-user"
+                 data-bs-toggle="tooltip" data-bs-placement="top" title="và {{ $users->count()-2 }} người khác">
+                <div class="symbol-label fs-2 fw-semibold bg-success text-inverse-success">  +{{ $users->count()-2 }}</div>
+            </div>
+            @break
+        @endif
+    @endforeach
+</div>

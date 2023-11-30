@@ -3,7 +3,7 @@
         <tr class="even" data-id="{{$child->id}}">
             <!--begin::Checkbox-->
             <td>
-                @if($child->user_id == $userId)
+                @if($child->user_id == $userId && !isset($keyword))
                     <div class="form-check">
                         <input class="form-check-input border-black checkbox-item-file" type="checkbox">
                     </div>

@@ -363,6 +363,36 @@ class AjaxController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $request->validate([
+            'keyword' => ['required', 'string', 'max:255'],
+        ]);
+        try {
+            $keyword = $request->input('keyword');
+            $userId = \auth()->id();
+            $user = User::findOrFail($userId);
+            $allFiles = $user->file->whereNotNull('parent_id')->merge($user->files);
+
+            $children = $allFiles->filter(function ($file) use ($keyword) {
+                return stripos($file->name, $keyword) !== false;
+            });
+            $users = User::all();
+            $users = $users->reject(function ($user) use ($userId) {
+                return $user->id == $userId;
+            });
+            $isTrash = $isShare = false;
+            $view = view('file-manager::pages.file-manager.components.folder', compact('children', 'isTrash', 'isShare', 'users', 'userId', 'keyword'))->render();
+            return response()->json([
+                'view' => $view,
+                'folder_path' => null,
+                'count_children' => $children?->count(),
+            ]);
+        }catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+    }
+
     private function processMoveFile(FileManager $fileChildManager, FileManager $parentFileManager)
     {
         $originalFilePath = $fileChildManager->file_path;

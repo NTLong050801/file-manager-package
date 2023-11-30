@@ -66,7 +66,7 @@
 <div class="separator separator-dashed my-5"></div>
 @foreach($folders as $folder)
 <!--begin::Item-->
-<div class="d-flex folder-move" data-id="{{$folder->id}}">
+<div class="folder-move" data-id="{{$folder->id}}">
     <!--begin::Checkbox-->
     <div class="form-check form-check-custom form-check-solid">
         <!--begin::Label-->
@@ -81,13 +81,15 @@
                             fill="currentColor"></path>
                     </svg>
                 </span>
-                <!--end::Svg Icon-->{{$folder->name}}
+                <!--end::Svg Icon-->
+                <span class="folder_name">{{$folder->name}}</span>
             </div>
         </label>
         <!--end::Label-->
     </div>
     <!--end::Checkbox-->
+    <div class="separator separator-dashed my-5"></div>
 </div>
 <!--end::Item-->
-<div class="separator separator-dashed my-5"></div>
+
 @endforeach

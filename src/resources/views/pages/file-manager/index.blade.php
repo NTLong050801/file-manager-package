@@ -21,7 +21,7 @@
         <!--begin::Card header-->
         <div class="card-header pt-8">
             <div class="card-title">
-                <div class="input-group">
+                <div class="input-group me-5">
                     <select
                         class="form-select w-200px"
                         id="type_folder"
@@ -35,6 +35,14 @@
                         <option value="private-folder">Tài liệu cá nhân</option>
                         <option value="share-folder">Tài liệu được chia sẻ</option>
                     </select>
+                </div>
+                <div class="col-md-8"> <!-- Second column for input and button -->
+                    <form action="" id="search_file_form">
+                        <div class="input-group">
+                            <input type="text" name="keyword" placeholder="Nhập tên file, tên thư mục" class="form-control" id="keyword" autocomplete="off">
+                            <button class="btn btn-success btn-search" type="submit">Tìm kiếm</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <!--begin::Card toolbar-->
@@ -299,18 +307,16 @@
                         <!--begin::Modal title-->
                         <h2 class="fw-bold">Chuyển thư mục</h2>
                         <!--end::Modal title-->
-                        <!--begin::Close-->
-                        <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
-                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-                            <span class="svg-icon svg-icon-1">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
-                                    <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
-                                </svg>
-                            </span>
-                            <!--end::Svg Icon-->
+                        <div class="card-toolbar">
+                            <div class="position-relative">
+                                <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                            <img src="http://company.smartcv-client.test/vendor/file-manager/icons/gen021.svg" alt="">
+                                        </span>
+                                <!--end::Svg Icon-->
+                                <input type="text" class="form-control-sm ps-10 border-black rounded-pill w-300px input_keyword_name_folder" placeholder="Tên thư mục" autocomplete="off">
+                            </div>
                         </div>
-                        <!--end::Close-->
                     </div>
                     <!--end::Modal header-->
                     <!--begin::Modal body-->
@@ -371,7 +377,7 @@
         {{--let csrfToken = "{{ csrf_token() }}";--}}
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         let userId = {{auth()->id()}};
-        let rowId, tr, folderId = null;
+        let rowId, tr, folderId, keyword = null;
         let navItemType = "all-folder";
 
         // set the dropzone container id
@@ -488,7 +494,7 @@
         myDropzone.on("complete", function (file) {
             myDropzone.off("uploadprogress");
             if (myDropzone.getQueuedFiles().length === 0 && myDropzone.getUploadingFiles().length === 0) {
-               loadFolder(false);
+                loadFolder(false);
             }
             const progressBars = dropzone.querySelectorAll('.dz-complete');
             setTimeout(function () {
@@ -543,7 +549,7 @@
             myDropzone.options.params.parent_id = newParentId;
         }
 
-        $('#btn_show_modal_upload_file').on('click',function () {
+        $('#btn_show_modal_upload_file').on('click', function () {
             myDropzone.removeAllFiles(true);
         })
 
@@ -577,13 +583,15 @@
             } else {
                 parentId = $(this).data('id');
                 // navItemType = $(this).data('type');
-                loadFolder(parentId)
+                loadFolder()
             }
         })
 
         $('#type_folder').on('change', function () {
             myDropzone.removeAllFiles();
             navItemType = $(this).val()
+            $('#keyword').val(null)
+            keyword = null
             if (navItemType === "deleted-folder" || navItemType === "share-folder") {
                 parentId = null;
                 $('#toolbar_upload').addClass('d-none')
@@ -691,7 +699,7 @@
                     formData.append('value', 0);
                     formData.append('is_direct_deleted', 0);
                     formData.append('_method', 'PATCH');
-                    putTrashFolder(formData,false)
+                    putTrashFolder(formData, false)
                 }
             });
         })
@@ -730,6 +738,22 @@
             });
         })
 
+
+        $(document).on('keyup', '.input_keyword_name_folder', function () {
+            const searchText = $(this).val().toLowerCase();
+            let countItem = 0;
+            $(this).closest('.modal').find(".folder-move").each(function () {
+                const fileName = $(this).find(".folder_name").text().toLowerCase();
+                if (fileName.includes(searchText)) {
+                    $(this).show();
+                    countItem++;
+                } else {
+                    $(this).hide();
+                }
+            });
+            $(this).closest('.modal').find('#kt_file_manager_items_counter').text(countItem + ' items')
+        })
+
         $(document).on('change', '.receiver-checkbox', function () {
             let userId = $(this).data('id');
             let is_active = $(this).prop("checked");
@@ -748,6 +772,9 @@
                 success: function (response) {
                     showToast('Thành công', 'Đã cập nhật thành công', 'success');
                     tr.find('.permission-users').html(response.view_permission_user);
+                    $('[data-bs-toggle="tooltip"], .add-permission').tooltip({
+                        trigger: 'hover'
+                    });
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
@@ -830,7 +857,7 @@
                         formData.append('value', 0);
                         formData.append('is_direct_deleted', 0);
                         formData.append('_method', 'PATCH');
-                        putTrashFolder(formData,false)
+                        putTrashFolder(formData, false)
 
                     }
                 });
@@ -852,6 +879,16 @@
         })
         $('#kt_modal_move_to_folder_submit').on('click', function () {
             moveFileToFolder()
+        })
+
+        $('#search_file_form').on('submit', function (event) {
+            event.preventDefault();
+            keyword = $('#keyword').val();
+            if (!keyword) {
+                showToast("Không để trống tên file!", null, 'error');
+            } else {
+                search(keyword)
+            }
         })
         const showDeleteButton = () => {
             let countItemCheckbox = $("#table_data .checkbox-item-file:checked").length;
@@ -902,35 +939,43 @@
             });
         }
         const loadFolder = (showPageLoading = true) => {
-            if (showPageLoading) {
-                KTApp.showPageLoading();
-            }
-            $.ajax({
-                url: "/ajax/children",
-                method: "GET",
-                data: {
-                    'parent_id': parentId,
-                    'type': navItemType,
-                    'user_id': userId,
-                },
-                success: function (response) {
-                    $('tbody').html(response.view)
-                    $('#folder_path').html(response.folder_path)
-                    $('#count_item').html(response.count_children.toString() + ' items')
-                    // $('[data-bs-toggle="tooltip"]').tooltip();
-                    showDeleteButton();
-                    KTMenu.createInstances();
-                    if (showPageLoading) {
-                        KTApp.hidePageLoading();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    showToast(xhr.responseJSON.message, null, 'error')
-                    if (showPageLoading) {
-                        KTApp.hidePageLoading();
-                    }
+            if (keyword){
+                search(keyword)
+            }else{
+                if (showPageLoading) {
+                    KTApp.showPageLoading();
                 }
-            })
+                $.ajax({
+                    url: "/ajax/children",
+                    method: "GET",
+                    data: {
+                        'parent_id': parentId,
+                        'type': navItemType,
+                        'user_id': userId,
+                    },
+                    success: function (response) {
+                        $('tbody').html(response.view)
+                        $('#folder_path').html(response.folder_path)
+                        $('#count_item').html(response.count_children.toString() + ' items')
+                        // $('[data-bs-toggle="tooltip"]').tooltip();
+                        showDeleteButton();
+                        KTMenu.createInstances();
+                        $('[data-bs-toggle="tooltip"], .add-permission').tooltip({
+                            trigger: 'hover'
+                        });
+                        if (showPageLoading) {
+                            KTApp.hidePageLoading();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        showToast(xhr.responseJSON.message, null, 'error')
+                        if (showPageLoading) {
+                            KTApp.hidePageLoading();
+                        }
+                    }
+                })
+            }
+
         }
         const createFolder = (formData) => {
             $.ajax({
@@ -1008,6 +1053,7 @@
                 },
                 success: function (response) {
                     $('#content_modal_move_file').html(response.view)
+                    $('.input_keyword_name_folder').val(null)
                 },
                 error: function (xhr, status, error) {
                     showToast(xhr.responseJSON.message, null, 'error')
@@ -1033,6 +1079,32 @@
                     showToast(xhr.responseJSON.message, null, 'error')
                 }
             })
+        }
+        const search = (keyword) => {
+            KTApp.showPageLoading();
+            $.ajax({
+                url: "{{route('ajax.search')}}",
+                data: {
+                    'keyword': keyword,
+                },
+                method: 'GET',
+                success: function (response) {
+                    $('tbody').html(response.view);
+                    $('#folder_path').html(response.folder_path);
+                    $('#count_item').html(response.count_children.toString() + ' items');
+                    $('#toolbar_upload').addClass('d-none');
+                    KTMenu.createInstances();
+                    $('[data-bs-toggle="tooltip"], .add-permission').tooltip({
+                        trigger: 'hover'
+                    });
+                    $('.checkbox-all').addClass('d-none')
+                    KTApp.hidePageLoading();
+                },
+                error: function (xhr, status, error) {
+                    showToast(xhr.responseJSON.message, null, 'error')
+                    KTApp.hidePageLoading();
+                }
+            });
         }
         loadFolder();
     })
